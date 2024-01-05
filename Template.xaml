@@ -1,0 +1,62 @@
+﻿<adonisControls:AdonisWindow x:Class="MinecraftResourcePack_Builder.Template"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
+        xmlns:adonisControls="clr-namespace:AdonisUI.Controls;assembly=AdonisUI"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:Metro="https://github.com/aduskin"  
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MinecraftResourcePack_Builder"
+        mc:Ignorable="d"
+        Title="模板" Height="600" Width="800">
+    <Grid x:Name="EditorMain">
+        <DockPanel x:Name="DockPanel">
+            <ScrollViewer x:Name="ScrollViewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <ItemsControl Name="FolderItemsControl"
+                          ItemsSource="{Binding Folders}"
+                          VirtualizingStackPanel.IsVirtualizing="True"
+                          VirtualizingStackPanel.VirtualizationMode="Recycling"
+                          ScrollViewer.CanContentScroll="True" Cursor="Hand">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Expander Header="{Binding FolderName}" IsExpanded="True">
+                            <ItemsControl ItemsSource="{Binding Images}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="8" />
+                                        <!-- Adjust column count as necessary -->
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Margin="5" BorderBrush="Black" BorderThickness="1">
+                                            <Button Width="180" Height="180"  BorderThickness="0" Padding="0" Click="Image_Click" Cursor="Hand">
+                                                <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <Image Source="{Binding ImageSource}" Width="100" Height="100" />
+                                                    <TextBlock Text="{Binding ImageName}" Margin="0,150,0,0" Height="30" TextAlignment="Center" VerticalAlignment="Bottom"/>
+                                                </Grid>
+                                            </Button>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Expander>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+
+        <DockPanel x:Name="LoadingOverlay" Background="Black" Visibility="Visible" Panel.ZIndex="100" Cursor="Wait">
+            <Metro:MetroProgressBar Name="ProgressBar" Height="20" DockPanel.Dock="Top" />
+            <Grid>
+                <Image Height="100" Width="100" Source="pack.png" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Metro:AduLoading SpeedRatio="1" Width="150" Height="150" Type="Rotate" IsActived="True"  VerticalAlignment="Center" Foreground="#FF409EFF"/>
+            </Grid>
+        </DockPanel>
+        
+    </Grid>
+
+</adonisControls:AdonisWindow>
+ 
