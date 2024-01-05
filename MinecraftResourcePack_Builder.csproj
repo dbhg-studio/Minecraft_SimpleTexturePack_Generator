@@ -108,6 +108,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="DrawBoard.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Template.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -129,6 +133,9 @@
     </Compile>
     <Compile Include="Create.xaml.cs">
       <DependentUpon>Create.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DrawBoard.xaml.cs">
+      <DependentUpon>DrawBoard.xaml</DependentUpon>
     </Compile>
     <Compile Include="Template.xaml.cs">
       <DependentUpon>Template.xaml</DependentUpon>

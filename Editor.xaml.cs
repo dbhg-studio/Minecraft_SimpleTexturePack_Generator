@@ -257,11 +257,31 @@ namespace MinecraftResourcePack_Builder
 
         private void OnChanged(object source, FileSystemEventArgs e)
         {
-            // 调用UI线程来更新UI
             Application.Current.Dispatcher.Invoke(() =>
             {
-                // 这里调用你的UI更新逻辑
-                UpdateUI();
+                // 查找对应的FolderItem和ImageItem
+                var folderName = Path.GetDirectoryName(e.FullPath);
+                var folderItem = Folders.FirstOrDefault(f => f.FolderPath == folderName);
+
+                if (folderItem != null)
+                {
+                    // 查找或创建对应的ImageItem
+                    var imageItem = folderItem.Images.FirstOrDefault(i => i.ImagePath == e.FullPath);
+                    if (imageItem == null)
+                    {
+                        // 如果ImageItem不存在，则创建它
+                        imageItem = new ImageItem(e.FullPath, folderItem);
+                        folderItem.Images.Add(imageItem);
+                    }
+                    else
+                    {
+                        // 如果ImageItem已存在，更新它的ImageSource
+                        LoadImage(imageItem);
+                    }
+                }
+
+                // 更新UI逻辑，确保ListView等UI组件反映最新的数据
+                FolderItemsControl.Items.Refresh();
             });
         }
 
