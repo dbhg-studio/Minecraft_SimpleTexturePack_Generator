@@ -1,12 +1,8 @@
 # 我的世界简易材质包生成器
 
-<center>
-	<span>Minecraft SimpleTexturePack Generator</span>
-</center>
+Minecraft SimpleTexturePack Generator
 
-<center>
-	<span>这是一个由蛋白后宫出品的简易材质包生成小工具，它可以帮助你快速生成我的世界游戏中的材质包。</span>
-</center>
+这是一个由蛋白后宫出品的简易材质包生成小工具，它可以帮助你快速生成我的世界游戏中的材质包。
 
 ![pack.png](./pack.png)
 
