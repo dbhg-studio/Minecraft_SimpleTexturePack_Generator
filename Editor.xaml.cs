@@ -283,50 +283,11 @@ namespace MinecraftResourcePack_Builder
         private void Image_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
-            if (button != null && button.DataContext is EImageItem imageItem)
+            if (button != null && button.DataContext is ImageItem imageItem)
             {
-                switch (Properties.Settings.Default.ImageEditorTool)
+                if (!aseprite.Open(imageItem.ImagePath))
                 {
-                    case 0:
-                        if (!aseprite.Open(imageItem.ImagePath))
-                        {
-                            MessageBox.Show("打开失败，即将使用画图工具打开");
-                            if (!mspaint.Open(imageItem.ImagePath))
-                            {
-                                MessageBox.Show("打开失败");
-                            }
-                        }
-                        break;
-                    case 1:
-                        if (!mspaint.Open(imageItem.ImagePath))
-                        {
-                            MessageBox.Show("打开失败");
-                        }
-                        break;
-                    case 2:
-                        if (!photoshop.Open(imageItem.ImagePath))
-                        {
-                            MessageBox.Show("打开失败，即将使用默认工具打开");
-                            if (!aseprite.Open(imageItem.ImagePath))
-                            {
-                                MessageBox.Show("打开失败，即将使用画图工具打开");
-                                if (!mspaint.Open(imageItem.ImagePath))
-                                {
-                                    MessageBox.Show("打开失败");
-                                }
-                            }
-                        }
-                        break;
-                    default:
-                        if (!aseprite.Open(imageItem.ImagePath))
-                        {
-                            MessageBox.Show("打开失败，即将使用画图工具打开");
-                            if (!mspaint.Open(imageItem.ImagePath))
-                            {
-                                MessageBox.Show("打开失败");
-                            }
-                        }
-                        break;
+                    MessageBox.Show("打开失败");
                 }
             }
         }
