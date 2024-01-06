@@ -1,16 +1,30 @@
-# 我的世界简易材质包生成器
+<center>
+	<h1>我的世界简易材质包生成器</h1>
+</center>
 
-Minecraft SimpleTexturePack Generator
+<center>
+	<p>Minecraft SimpleTexturePack Generator</p>
+</center>
 
-这是一个由蛋白后宫出品的简易材质包生成小工具，它可以帮助你快速生成我的世界游戏中的材质包。
+<center>
+	<p>这是一个由蛋白后宫出品的简易材质包生成小工具，它可以帮助你快速生成我的世界游戏中的材质包。</p>
+</center>
 
 ![pack.png](./pack.png)
 
-<center>开源仓库：[Gitee](https://gitee.com/dbhg/Minecraft_SimpleTexturePack_Generator) | [Github](https://github.com/dbhg-studio/Minecraft_SimpleTexturePack_Generator)</center>
 
-[蛋白后宫](https://dbhg.top) | [作者主页](https://alwolf.cn)
+<center>
+	<p>开源仓库：<a href="https://gitee.com/dbhg/Minecraft_SimpleTexturePack_Generator">Gitee</a> | <a href="https://github.com/dbhg-studio/Minecraft_SimpleTexturePack_Generator">Github</a></p>
+</center>
 
-- 能否点亮右上角的Star，谢谢你啦OVO!!
+
+<center>
+	<p><a href="https://dbhg.top">蛋白后宫</a> | <a href="https://alwolf.cn">作者主页</a></p>
+</center>
+
+<center>
+	<p>能否点亮右上角的Star，谢谢你啦OVO!!</p>
+</center>
 
 ## 特点
 
