@@ -152,7 +152,7 @@ namespace MinecraftResourcePack_Builder
                             continue;
 
                         var imageItem = new ImageItem(imagePath, folderItem);
-                        LoadImage(imageItem); // LoadImage now directly works with the file system
+                        await LoadImageAsync(imageItem); // LoadImage now directly works with the file system
                         folderItem.Images.Add(imageItem);
 
                         currentProgress++;
@@ -219,23 +219,33 @@ namespace MinecraftResourcePack_Builder
             }
         }
 
-        private bool IsFileLocked(FileInfo file)
+        private async Task LoadImageAsync(ImageItem imageItem)
         {
             try
             {
-                using (FileStream stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None))
-                {
-                    stream.Close();
-                }
-            }
-            catch (IOException)
-            {
-                // 文件被占用或无法访问
-                return true;
-            }
+                BitmapImage bitmapImage = null;
+                await Application.Current.Dispatcher.InvokeAsync(() => {
+                    // 在UI线程上创建BitmapImage并进行初始化
+                    bitmapImage = new BitmapImage();
+                    bitmapImage.BeginInit();
+                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmapImage.UriSource = new Uri(imageItem.ImagePath, UriKind.Absolute);
+                    bitmapImage.DecodePixelWidth = 100; // 调整为合适的尺寸
+                    bitmapImage.DecodePixelHeight = 100; // 调整为合适的尺寸
+                    bitmapImage.EndInit();
+                    bitmapImage.Freeze(); // 允许跨线程访问
+                });
 
-            // 文件可以访问
-            return false;
+                // 现在bitmapImage已经不可变，可以在任何线程上访问
+                imageItem.ImageSource = bitmapImage;
+            }
+            catch (Exception ex)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    MessageBox.Show($"Failed to load image: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                });
+            }
         }
 
         private void Image_Click(object sender, RoutedEventArgs e)
@@ -371,29 +381,31 @@ namespace MinecraftResourcePack_Builder
         private void PopulateImages(FolderItem folderItem)
         {
             string[] imagePaths = ExtractImagesFromFolder(folderItem.FolderPath);
+            var imagesToUpdate = new ObservableCollection<ImageItem>();
 
             foreach (var imagePath in imagePaths)
             {
                 var imageItem = new ImageItem(imagePath, folderItem);
-                LoadImage(imageItem); // 可能需要调整此方法，以避免跨线程操作
-                Application.Current.Dispatcher.Invoke(() => folderItem.Images.Add(imageItem));
+                LoadImage(imageItem); // LoadImage 将异步执行，这里不应该有跨线程操作问题
+                imagesToUpdate.Add(imageItem);
             }
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                folderItem.Images = imagesToUpdate;
+                folderItem.OnPropertyChanged(nameof(FolderItem.Images));
+            });
         }
 
         private void Refresh_Click(object sender, RoutedEventArgs e)
         {
+            // 遍历所有文件夹项，并更新它们的图像
             foreach (var folder in Folders)
             {
-                foreach (var image in folder.Images)
-                {
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        LoadImage(image);
-                    });
-                }
+                PopulateImages(folder);
             }
 
-            // 通知ItemsControl刷新
+            // 通知ItemsControl刷新以更新UI
             FolderItemsControl.Items.Refresh();
         }
 

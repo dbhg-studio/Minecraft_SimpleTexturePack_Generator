@@ -68,13 +68,13 @@ namespace MinecraftResourcePack_Builder
             });
 
             Task.Run(async () => await LoadData(progress)).ContinueWith(t =>
-              {
-                  // Hide progress bar when done
-                  ProgressBar.Visibility = Visibility.Hidden;
-                  LoadingOverlay.Visibility = Visibility.Hidden;
+            {
+                // Hide progress bar when done
+                ProgressBar.Visibility = Visibility.Hidden;
+                LoadingOverlay.Visibility = Visibility.Hidden;
 
-                  EditorMain.Children.Remove(LoadingOverlay);
-              }, TaskScheduler.FromCurrentSynchronizationContext());
+                EditorMain.Children.Remove(LoadingOverlay);
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private async Task LoadData(IProgress<int> progress)
@@ -111,7 +111,7 @@ namespace MinecraftResourcePack_Builder
                         }
 
                         ImageItem imageItem = new ImageItem(imagePath, folderItem);
-                        LoadImage(imageItem); // LoadImage now directly works with the file system
+                      await  LoadImageAsync(imageItem); // LoadImage now directly works with the file system
                         folderItem.Images.Add(imageItem);
 
                         currentProgress++;
@@ -167,6 +167,35 @@ namespace MinecraftResourcePack_Builder
             catch (Exception ex)
             {
                 Dispatcher.Invoke(() => MessageBox.Show("Failed to load image: " + ex.Message));
+            }
+        }
+
+        private async Task LoadImageAsync(ImageItem imageItem)
+        {
+            try
+            {
+                BitmapImage bitmapImage = null;
+                await Application.Current.Dispatcher.InvokeAsync(() => {
+                    // 在UI线程上创建BitmapImage并进行初始化
+                    bitmapImage = new BitmapImage();
+                    bitmapImage.BeginInit();
+                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmapImage.UriSource = new Uri(imageItem.ImagePath, UriKind.Absolute);
+                    bitmapImage.DecodePixelWidth = 100; // 调整为合适的尺寸
+                    bitmapImage.DecodePixelHeight = 100; // 调整为合适的尺寸
+                    bitmapImage.EndInit();
+                    bitmapImage.Freeze(); // 允许跨线程访问
+                });
+
+                // 现在bitmapImage已经不可变，可以在任何线程上访问
+                imageItem.ImageSource = bitmapImage;
+            }
+            catch (Exception ex)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    MessageBox.Show($"Failed to load image: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                });
             }
         }
 
