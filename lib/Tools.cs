@@ -8,7 +8,10 @@ using System.Windows.Media.Imaging;
 
 namespace MinecraftResourcePack_Builder.lib
 {
-    class Tools
+    /// <summary>
+    /// 小工具
+    /// </summary>
+    public class Tools
     {
         /// <summary>
         /// 文件夹是否存在
@@ -370,7 +373,133 @@ namespace MinecraftResourcePack_Builder.lib
             };
             return messageBox;
         }
+    }
 
+    /// <summary>
+    /// 使用Aseprite
+    /// </summary>
+    public class Aseprite
+    {
+        Process AsepriteProcess = null;
 
+        /// <summary>
+        /// 打开Aseprite编辑图片
+        /// </summary>
+        /// <param name="path">图片路径</param>
+        /// <returns>
+        ///  打开成功返回 true，否则 false。
+        /// </returns>
+        public bool Open(string path)
+        {
+            try
+            {
+                AsepriteProcess = Process.Start($@"{AppDomain.CurrentDomain.BaseDirectory}Plugin\Aseprite\Aseprite.exe", path);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 关闭Aseprite
+        /// </summary>
+        /// <returns>
+        ///  关闭成功返回 true，否则 false。
+        /// </returns>
+        public bool Close()
+        {
+            try
+            {
+                if (AsepriteProcess != null && !AsepriteProcess.HasExited)
+                {
+                    //if (!AsepriteProcess.HasExited)
+                    //{
+                    //    AsepriteProcess.Kill();
+                    //    return true;
+                    //}
+
+                    AsepriteProcess.CloseMainWindow();
+                    return AsepriteProcess.WaitForExit(5000);
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally
+            {
+                if (AsepriteProcess != null && !AsepriteProcess.HasExited)
+                {
+                    AsepriteProcess.Close();
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Photoshop
+    /// </summary>
+    public class Photoshop
+    {
+        Process PhotoshopProcess = null;
+
+        /// <summary>
+        /// 打开Photoshop编辑图片
+        /// </summary>
+        /// <param name="path">图片路径</param>
+        /// <returns>
+        ///  打开成功返回 true，否则 false。
+        /// </returns>
+        public bool Open(string path)
+        {
+            try
+            {
+                PhotoshopProcess = Process.Start($@"{AppDomain.CurrentDomain.BaseDirectory}Plugin\Aseprite\Aseprite.exe", path);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 关闭Photoshop
+        /// </summary>
+        /// <returns>
+        ///  关闭成功返回 true，否则 false。
+        /// </returns>
+        public bool Close()
+        {
+            try
+            {
+                if (PhotoshopProcess != null && !PhotoshopProcess.HasExited)
+                {
+                    //if (!AsepriteProcess.HasExited)
+                    //{
+                    //    AsepriteProcess.Kill();
+                    //    return true;
+                    //}
+
+                    PhotoshopProcess.CloseMainWindow();
+                    return PhotoshopProcess.WaitForExit(5000);
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally
+            {
+                if (PhotoshopProcess != null && !PhotoshopProcess.HasExited)
+                {
+                    PhotoshopProcess.Close();
+                }
+            }
+        }
     }
 }

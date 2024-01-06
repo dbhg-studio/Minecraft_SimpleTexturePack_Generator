@@ -24,7 +24,7 @@ namespace MinecraftResourcePack_Builder
         Tools tools = new Tools();
         public ObservableCollection<FolderItem> Folders { get; set; }
 
-        public Template(string projectName = null,string projectPath = null)
+        public Template(string projectName = null, string projectPath = null)
         {
             ProjectName = projectName;
             ProjectPath = projectPath;
@@ -67,14 +67,14 @@ namespace MinecraftResourcePack_Builder
                 ProgressBar.Value = value;
             });
 
-            Task.Run(async() => await LoadData(progress)).ContinueWith(t =>
-             {
-                 // Hide progress bar when done
-                 ProgressBar.Visibility = Visibility.Hidden;
-                 LoadingOverlay.Visibility = Visibility.Hidden;
+            Task.Run(async () => await LoadData(progress)).ContinueWith(t =>
+              {
+                  // Hide progress bar when done
+                  ProgressBar.Visibility = Visibility.Hidden;
+                  LoadingOverlay.Visibility = Visibility.Hidden;
 
-                 EditorMain.Children.Remove(LoadingOverlay);
-             }, TaskScheduler.FromCurrentSynchronizationContext());
+                  EditorMain.Children.Remove(LoadingOverlay);
+              }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private async Task LoadData(IProgress<int> progress)

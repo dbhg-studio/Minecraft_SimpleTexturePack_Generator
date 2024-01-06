@@ -38,7 +38,7 @@
                             <TextBlock Text="新建" HorizontalAlignment="Center" VerticalAlignment="Center"   FontSize="12" Margin="6,38,6,6" Width="48" TextAlignment="Center"/>
                         </Grid>
                     </Button>
-                    <Button x:Name="Setting" Width="80" Height="80" Margin="120,0,394,0" Cursor="Hand">
+                    <Button x:Name="Setting" Width="80" Height="80" Margin="120,0,394,0" Cursor="Hand" Click="Setting_Click">
                         <Grid Width="60" Height="60" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <materialDesign:PackIcon Kind="Settings" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.9,-0.206" Margin="-5,7,-4,17" Width="48" />
                             <TextBlock Text="设置" HorizontalAlignment="Center" VerticalAlignment="Center"   FontSize="12" Margin="6,38,6,6" Width="48" TextAlignment="Center"/>

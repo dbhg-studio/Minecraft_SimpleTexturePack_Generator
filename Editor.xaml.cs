@@ -2,8 +2,10 @@
 using MinecraftResourcePack_Builder.lib;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,53 +22,74 @@ namespace MinecraftResourcePack_Builder
     /// </summary>
     public partial class Editor : AdonisWindow
     {
-
+        CancellationTokenSource cancellationTokenSource;
         private FileSystemWatcher _watcher;
         public string ProjectName { get; private set; }
         public string ProjectPath { get; private set; }
         public int OpenType { get; private set; }
         Tools tools = new Tools();
+        Aseprite aseprite = new Aseprite();
         public ObservableCollection<FolderItem> Folders { get; set; }
+        public ObservableCollection<ImageItem> Images { get; set; }
 
         public Editor(string projectName = null, int openType = 0, string projectPath = null)
         {
-            ProjectName = projectName;
-            ProjectPath = projectPath;
-            OpenType = openType;
-
-            InitializeComponent();
-
-            if (openType == 1)
+            if (projectName == null && openType == 0 && projectPath == null)
             {
-                DockPanel.Children.Remove(ButtonPopup);
+                InitializeComponent();
+                return;
             }
-            Folders = new ObservableCollection<FolderItem>(); // 初始化 Folders
-            FolderItemsControl.ItemsSource = Folders;
-            DataContext = this;
-            LoadFoldersAndImages();
-            InitializeFileSystemWatcher();
-
-            // 为窗口添加滚轮事件处理
-            this.PreviewMouseWheel += (s, e) =>
+            else
             {
-                if (!e.Handled)
+                ProjectName = projectName;
+                ProjectPath = projectPath;
+                OpenType = openType;
+
+                InitializeComponent();
+
+                if (openType == 1)
                 {
-                    e.Handled = true;
-                    var eventArg = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta);
-                    eventArg.RoutedEvent = UIElement.MouseWheelEvent;
-                    eventArg.Source = e.Source;
-                    ScrollViewer.RaiseEvent(eventArg); // 将事件重定向到ScrollViewer
+                    DockPanel.Children.Remove(ButtonPopup);
                 }
-            };
+                Folders = new ObservableCollection<FolderItem>(); // 初始化 Folders
+                FolderItemsControl.ItemsSource = Folders;
+                DataContext = this;
+                LoadFoldersAndImages();
+                InitializeFileSystemWatcher();
+                // 为窗口添加滚轮事件处理
+                this.PreviewMouseWheel += (s, e) =>
+                {
+                    if (!e.Handled)
+                    {
+                        e.Handled = true;
+                        var eventArg = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta);
+                        eventArg.RoutedEvent = UIElement.MouseWheelEvent;
+                        eventArg.Source = e.Source;
+                        ScrollViewer.RaiseEvent(eventArg); // 将事件重定向到ScrollViewer
+                    }
+                };
+            }
 
             this.Closing += delegate
             {
+                if (!aseprite.Close())
+                {
+                    MessageBox.Show("关闭失败");
+                }
                 Application.Current.Shutdown();
             };
         }
 
         private void LoadFoldersAndImages()
         {
+            if (cancellationTokenSource != null)
+            {
+                cancellationTokenSource.Cancel();
+            }
+
+            cancellationTokenSource = new CancellationTokenSource();
+            var token = cancellationTokenSource.Token;
+
             // Assume we show a progress bar
             ProgressBar.Visibility = Visibility.Visible;
             ProgressBar.Maximum = 100;
@@ -77,14 +100,26 @@ namespace MinecraftResourcePack_Builder
                 ProgressBar.Value = value;
             });
 
-            Task.Run(async() => await LoadData(progress)).ContinueWith(t =>
-             {
-                 // Hide progress bar when done
-                 ProgressBar.Visibility = Visibility.Hidden;
-                 LoadingOverlay.Visibility = Visibility.Hidden;
-
-                 EditorMain.Children.Remove(LoadingOverlay);
-             }, TaskScheduler.FromCurrentSynchronizationContext());
+            Task.Run(async () =>
+            {
+                // 把token传递给需要进行长时间操作的方法
+                await LoadData(progress);
+            }, token).ContinueWith(t =>
+            {
+                // Hide progress bar when done
+                ProgressBar.Visibility = Visibility.Hidden;
+                LoadingOverlay.Visibility = Visibility.Hidden;
+                EditorMain.Children.Remove(LoadingOverlay);
+                if (t.IsCanceled)
+                {
+                    // 任务被取消时的处理
+                }
+                else if (t.Exception != null)
+                {
+                    // 出现异常时的处理
+                    MessageBox.Show(t.Exception.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }, CancellationToken.None, TaskContinuationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private async Task LoadData(IProgress<int> progress)
@@ -152,23 +187,31 @@ namespace MinecraftResourcePack_Builder
 
         private void LoadImage(ImageItem imageItem)
         {
+            string imagePath = imageItem.ImagePath;
+
             try
             {
-                var bitmapImage = new BitmapImage();
-                bitmapImage.BeginInit();
-                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapImage.UriSource = new Uri(imageItem.ImagePath, UriKind.Absolute);
-                bitmapImage.EndInit();
-
-                if (bitmapImage.CanFreeze)
+                if (File.Exists(imagePath))
                 {
-                    bitmapImage.Freeze(); // 确保跨线程访问
+                    BitmapImage bitmapImage = new BitmapImage();
+
+                    // 使用一个唯一的URI加载图像以绕过缓存
+                    using (var stream = new FileStream(imagePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    {
+                        bitmapImage.BeginInit();
+                        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                        // 使用流而不是直接使用URI来避免缓存问题
+                        bitmapImage.StreamSource = stream;
+                        bitmapImage.EndInit();
+                        bitmapImage.Freeze(); // 为了确保图像可以跨线程使用
+                    }
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        imageItem.ImageSource = bitmapImage;
+                        imageItem.OnPropertyChanged(nameof(ImageItem.ImageSource));
+                    });
                 }
-
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    imageItem.ImageSource = bitmapImage;
-                });
             }
             catch (Exception ex)
             {
@@ -176,53 +219,35 @@ namespace MinecraftResourcePack_Builder
             }
         }
 
+        private bool IsFileLocked(FileInfo file)
+        {
+            try
+            {
+                using (FileStream stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None))
+                {
+                    stream.Close();
+                }
+            }
+            catch (IOException)
+            {
+                // 文件被占用或无法访问
+                return true;
+            }
+
+            // 文件可以访问
+            return false;
+        }
+
         private void Image_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
             if (button != null && button.DataContext is ImageItem imageItem)
             {
-                var openFileDialog = new Microsoft.Win32.OpenFileDialog
+                if (!aseprite.Open(imageItem.ImagePath))
                 {
-                    Filter = "PNG贴图文件 (*.png)|*.png",
-                    InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures)
-                };
-                if (openFileDialog.ShowDialog() == true)
-                {
-                    var sourceImagePath = openFileDialog.FileName;
-                    // 假设 targetFolderPath 是您希望复制到的目标文件夹
-                    // 检查文件夹是否存在
-                    if (!tools.Isfolder(tools.ProjectPath(ProjectName, $@"src\assets\minecraft\textures\{imageItem.ParentFolder.FolderName}")))
-                    {
-                        Directory.CreateDirectory(tools.ProjectPath(ProjectName, $@"src\assets\minecraft\textures\{imageItem.ParentFolder.FolderName}"));
-                    }
-                    var targetFolderPath = tools.ProjectPath(ProjectName, $@"src\assets\minecraft\textures\{imageItem.ParentFolder.FolderName}"); // 请替换为您的目标文件夹路径
-                    var targetImagePath = Path.Combine(targetFolderPath, imageItem.ImageName);
-                    try
-                    {
-                        // 复制图片到指定文件夹，保持原文件名
-                        File.Copy(sourceImagePath, targetImagePath, true);
-
-                        // 更新ImageItem以反映新的图片位置
-                        UpdateImageItem(imageItem, targetImagePath);
-
-                        MessageBox.Show("添加成功", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"失败原因： {ex.Message}", "添加失败", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
+                    MessageBox.Show("打开失败");
                 }
             }
-        }
-
-        private void UpdateImageItem(ImageItem imageItem, string imagePath)
-        {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                // 更新ImagePath以指向新位置，这是可选的，取决于您是否希望在ImageItem对象中保留新路径
-                imageItem.ImagePath = imagePath;
-                imageItem.ImageSource = new BitmapImage(new Uri(imagePath));
-            });
         }
 
         private void Build_Click(object sender, RoutedEventArgs e)
@@ -234,7 +259,7 @@ namespace MinecraftResourcePack_Builder
         {
             try
             {
-                // 设置 FileSystemWatcher来监视文本文件的变化
+                // 设置 FileSystemWatcher来监视图片文件的变化
                 _watcher = new FileSystemWatcher(tools.ProjectPath(ProjectName, @"src\assets\minecraft\textures"))
                 {
                     NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName,
@@ -251,75 +276,95 @@ namespace MinecraftResourcePack_Builder
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"监听错误，请重启程序 - {ex.ToString()}");
+                MessageBox.Show($"设置监视器时出现错误 - {ex.Message}");
             }
         }
 
         private void OnChanged(object source, FileSystemEventArgs e)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            // 使用BeginInvoke在UI线程上异步执行，添加一个延迟以等待文件写入完成
+            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
-                // 查找对应的FolderItem和ImageItem
-                var folderName = Path.GetDirectoryName(e.FullPath);
-                var folderItem = Folders.FirstOrDefault(f => f.FolderPath == folderName);
-
-                if (folderItem != null)
+                // 稍微延迟再尝试加载图片
+                Task.Delay(500).ContinueWith(t =>
                 {
-                    // 查找或创建对应的ImageItem
-                    var imageItem = folderItem.Images.FirstOrDefault(i => i.ImagePath == e.FullPath);
-                    if (imageItem == null)
-                    {
-                        // 如果ImageItem不存在，则创建它
-                        imageItem = new ImageItem(e.FullPath, folderItem);
-                        folderItem.Images.Add(imageItem);
-                    }
-                    else
-                    {
-                        // 如果ImageItem已存在，更新它的ImageSource
-                        LoadImage(imageItem);
-                    }
-                }
-
-                // 更新UI逻辑，确保ListView等UI组件反映最新的数据
-                FolderItemsControl.Items.Refresh();
-            });
+                    RefreshImageItem(e.FullPath);
+                }, TaskScheduler.FromCurrentSynchronizationContext());
+            }));
         }
 
         private void OnRenamed(object source, RenamedEventArgs e)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            // 使用InvokeAsync以避免在UI线程上造成阻塞
+            Application.Current.Dispatcher.InvokeAsync(() => UpdateUI());
+        }
+
+        private void RefreshImageItem(string imagePath)
+        {
+            foreach (var folder in Folders)
             {
-                // 这里调用你的UI更新逻辑
-                UpdateUI();
-            });
+                var imageItem = folder.Images.FirstOrDefault(i => i.ImagePath.Equals(imagePath, StringComparison.OrdinalIgnoreCase));
+                if (imageItem != null)
+                {
+                    // 重新加载图像项
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        // 这里需要先尝试释放旧的BitmapImage资源，以避免文件占用的问题
+                        if (imageItem.ImageSource != null)
+                        {
+                            imageItem.ImageSource = null;
+                        }
+
+                        // 稍微延迟加载新图片，以确保文件系统已经完成了写操作
+                        Task.Delay(500).ContinueWith((t) =>
+                        {
+                            LoadImage(imageItem);
+                        }, TaskScheduler.FromCurrentSynchronizationContext());
+                    });
+
+                    break;
+                }
+            }
         }
 
         // 你可能需要编写这个函数来更新UI元素
         private void UpdateUI()
         {
-            // 假设这个方法被调用来处理创建、变更或删除事件
-            string[] updatedFolderPaths = ExtractFolders(tools.ProjectPath(ProjectName, @"src\assets\minecraft\textures"));
-
-            foreach (var updatedFolderPath in updatedFolderPaths)
+            // 这里调用你的UI更新逻辑
+            try
             {
-                string folderName = Path.GetFileName(updatedFolderPath);
+                // 检索更新后的文件夹和图片信息
+                var folderPaths = ExtractFolders(tools.ProjectPath(ProjectName, @"src\assets\minecraft\textures"));
+                var updatedFolders = new ObservableCollection<FolderItem>();
 
-                // 检查ObservableCollection中是否已经存在这个folderName
-                var existingFolderItem = Folders.FirstOrDefault(f => f.FolderName == folderName);
+                foreach (var folderPath in folderPaths)
+                {
+                    var folderItem = new FolderItem(folderPath);
+                    var imagePaths = ExtractImagesFromFolder(folderPath);
 
-                if (existingFolderItem == null)
-                {
-                    // 如果不存在，则创建新的FolderItem并添加到集合中
-                    var newFolderItem = new FolderItem(updatedFolderPath);
-                    PopulateImages(newFolderItem);
-                    Application.Current.Dispatcher.Invoke(() => Folders.Add(newFolderItem));
+                    foreach (var imagePath in imagePaths)
+                    {
+                        var imageItem = new ImageItem(imagePath, folderItem);
+                        LoadImage(imageItem);
+                        folderItem.Images.Add(imageItem);
+                    }
+
+                    updatedFolders.Add(folderItem);
                 }
-                else
-                {
-                    // 如果存在，更新这个FolderItem的Images
-                    existingFolderItem.Images.Clear();
-                    PopulateImages(existingFolderItem);
-                }
+
+                // 将Folders更新为最新的集合
+                Folders = updatedFolders;
+
+                // 确保FolderItemsControl绑定到新的Folders集合
+                FolderItemsControl.ItemsSource = Folders;
+
+                // 刷新FolderItemsControl
+                FolderItemsControl.Items.Refresh();
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"更新UI时出现问题 - {ex.Message}");
             }
         }
 
@@ -334,14 +379,40 @@ namespace MinecraftResourcePack_Builder
                 Application.Current.Dispatcher.Invoke(() => folderItem.Images.Add(imageItem));
             }
         }
+
+        private void Refresh_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var folder in Folders)
+            {
+                foreach (var image in folder.Images)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        LoadImage(image);
+                    });
+                }
+            }
+
+            // 通知ItemsControl刷新
+            FolderItemsControl.Items.Refresh();
+        }
+
+
     }
 }
 // 数据模型
-public class FolderItem
+public class FolderItem: INotifyPropertyChanged
 {
     public string FolderName { get; set; }
     public ObservableCollection<ImageItem> Images { get; set; }
     public string FolderPath { get; private set; } // 添加这个属性
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    public void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 
     public FolderItem(string path)
     {
@@ -351,13 +422,32 @@ public class FolderItem
     }
 }
 
-public class ImageItem
+public class ImageItem : INotifyPropertyChanged
 {
     public string ImagePath { get; set; }
     public string ImageName { get; set; }
     public FolderItem ParentFolder { get; set; } // 添加此属性以引用父文件夹
     public string NewImagePath { get; set; }
-    public BitmapImage ImageSource { get; set; }
+    private BitmapImage _imageSource;
+    public BitmapImage ImageSource
+    {
+        get => _imageSource;
+        set
+        {
+            if (_imageSource != value)
+            {
+                _imageSource = value;
+                OnPropertyChanged(nameof(ImageSource));
+            }
+        }
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    public void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 
     public ImageItem(string path, FolderItem parentFolder)
     {

@@ -47,7 +47,8 @@
             </ItemsControl>
         </ScrollViewer>
         <Canvas x:Name="ButtonPopup" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-            <Metro:AduFlatButton x:Name="Build" Content="打包" Width="50" Height="30" Margin="20" Canvas.Right="0" Canvas.Bottom="0" Click="Build_Click" />
+                <Metro:AduFlatButton x:Name="Refresh" Content="刷新" Width="50" Height="30" Margin="20,20,80,20" Canvas.Right="0" Canvas.Bottom="0" Click="Refresh_Click" />
+                <Metro:AduFlatButton x:Name="Build" Content="打包" Width="50" Height="30" Margin="20" Canvas.Right="0" Canvas.Bottom="0" Click="Build_Click" />
         </Canvas>
     </DockPanel>
 

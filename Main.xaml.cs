@@ -108,6 +108,11 @@ namespace MinecraftResourcePack_Builder
             return items;
         }
 
+        private void Setting_Click(object sender, RoutedEventArgs e)
+        {
+            Settings settings = new Settings();
+            settings.ShowDialog();
+        }
     }
 }
 public class CompanyModel
