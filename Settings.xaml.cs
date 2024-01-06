@@ -65,12 +65,12 @@ namespace MinecraftResourcePack_Builder
 
         private void Gitee_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            tools.OpenLink("https://gitee.com/dbhg/MinecraftResourcePack_Builder");
+            tools.OpenLink("https://gitee.com/dbhg/Minecraft_SimpleTexturePack_Generator");
         }
 
         private void Github_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            tools.OpenLink("https://github.com/dbhg-studio/MinecraftResourcePack_Builder");
+            tools.OpenLink("https://github.com/dbhg-studio/Minecraft_SimpleTexturePack_Generator");
         }
     }
 }
