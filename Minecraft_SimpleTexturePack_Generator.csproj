@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{EA1D91EA-5B98-43BD-915B-74098E35A001}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>MinecraftResourcePack_Builder</RootNamespace>
-    <AssemblyName>MinecraftResourcePack_Builder</AssemblyName>
+    <RootNamespace>Minecraft_SimpleTexturePack_Generator</RootNamespace>
+    <AssemblyName>Minecraft_SimpleTexturePack_Generator</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -52,7 +52,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>MinecraftResourcePack_Builder.App</StartupObject>
+    <StartupObject>Minecraft_SimpleTexturePack_Generator.App</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
     <TargetZone>LocalIntranet</TargetZone>

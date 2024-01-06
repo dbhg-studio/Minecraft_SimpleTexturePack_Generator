@@ -1,7 +1,7 @@
 ﻿using AduSkin.Controls.Metro;
 using System.Windows;
 
-namespace MinecraftResourcePack_Builder
+namespace Minecraft_SimpleTexturePack_Generator
 {
     /// <summary>
     /// App.xaml 的交互逻辑

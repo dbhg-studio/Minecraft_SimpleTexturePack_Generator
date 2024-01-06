@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
 
-namespace MinecraftResourcePack_Builder.lib
+namespace Minecraft_SimpleTexturePack_Generator.lib
 {
     /// <summary>
     /// 小工具

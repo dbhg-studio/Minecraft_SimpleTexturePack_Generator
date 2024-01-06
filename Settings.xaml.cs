@@ -1,7 +1,7 @@
 ﻿using AdonisUI.Controls;
-using MinecraftResourcePack_Builder.lib;
+using Minecraft_SimpleTexturePack_Generator.lib;
 
-namespace MinecraftResourcePack_Builder
+namespace Minecraft_SimpleTexturePack_Generator
 {
     /// <summary>
     /// Settings.xaml 的交互逻辑

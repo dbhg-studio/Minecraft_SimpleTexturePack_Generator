@@ -5,11 +5,11 @@ using System.Windows;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("MinecraftResourcePack_Builder")]
+[assembly: AssemblyTitle("Minecraft_SimpleTexturePack_Generator")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("MinecraftResourcePack_Builder")]
+[assembly: AssemblyProduct("Minecraft_SimpleTexturePack_Generator")]
 [assembly: AssemblyCopyright("Copyright ©  2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

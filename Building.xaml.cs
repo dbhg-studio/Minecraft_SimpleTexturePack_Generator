@@ -6,7 +6,7 @@ using System.IO.Compression;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MinecraftResourcePack_Builder
+namespace Minecraft_SimpleTexturePack_Generator
 {
     /// <summary>
     /// Building.xaml 的交互逻辑

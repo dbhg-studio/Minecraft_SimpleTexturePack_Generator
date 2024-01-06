@@ -1,5 +1,5 @@
 ﻿using AdonisUI.Controls;
-using MinecraftResourcePack_Builder.lib;
+using Minecraft_SimpleTexturePack_Generator.lib;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace MinecraftResourcePack_Builder
+namespace Minecraft_SimpleTexturePack_Generator
 {
     /// <summary>
     /// TemplateDownload.xaml 的交互逻辑

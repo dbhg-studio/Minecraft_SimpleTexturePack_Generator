@@ -1,5 +1,5 @@
 ﻿using AdonisUI.Controls;
-using MinecraftResourcePack_Builder.lib;
+using Minecraft_SimpleTexturePack_Generator.lib;
 using System;
 using System.IO;
 using System.Windows;
@@ -10,7 +10,7 @@ using MessageBoxImage = AdonisUI.Controls.MessageBoxImage;
 using MessageBoxResult = AdonisUI.Controls.MessageBoxResult;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
 
-namespace MinecraftResourcePack_Builder
+namespace Minecraft_SimpleTexturePack_Generator
 {
     /// <summary>
     /// Create.xaml 的交互逻辑

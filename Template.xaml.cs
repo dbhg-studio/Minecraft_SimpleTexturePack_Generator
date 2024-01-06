@@ -1,5 +1,5 @@
 ﻿using AdonisUI.Controls;
-using MinecraftResourcePack_Builder.lib;
+using Minecraft_SimpleTexturePack_Generator.lib;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -12,7 +12,7 @@ using MessageBox = AdonisUI.Controls.MessageBox;
 using MessageBoxButton = AdonisUI.Controls.MessageBoxButton;
 using MessageBoxImage = AdonisUI.Controls.MessageBoxImage;
 
-namespace MinecraftResourcePack_Builder
+namespace Minecraft_SimpleTexturePack_Generator
 {
     /// <summary>
     /// Editor.xaml 的交互逻辑

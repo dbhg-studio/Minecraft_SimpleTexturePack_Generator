@@ -1,6 +1,6 @@
 ﻿using AdonisUI.Controls;
 using MaterialDesignThemes.Wpf;
-using MinecraftResourcePack_Builder.lib;
+using Minecraft_SimpleTexturePack_Generator.lib;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Reflection;
@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using MessageBox = AdonisUI.Controls.MessageBox;
 
-namespace MinecraftResourcePack_Builder
+namespace Minecraft_SimpleTexturePack_Generator
 {
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
