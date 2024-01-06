@@ -1,6 +1,7 @@
 ﻿using AdonisUI.Controls;
 using MinecraftResourcePack_Builder.lib;
 using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -29,6 +30,10 @@ namespace MinecraftResourcePack_Builder
         {
             if (PackName.Text != "" && PackVersion.SelectedItem != null)
             {
+                if (!Core.Isfolder(Core.ProjectPath()))
+                {
+                    Directory.CreateDirectory(Core.ProjectPath());
+                }
                 ComboBoxItem selectedItem = (ComboBoxItem)PackVersion.SelectedItem;
                 string Value = selectedItem.Tag.ToString();
                 ProjectVersion = selectedItem.Content.ToString();

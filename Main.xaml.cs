@@ -44,7 +44,6 @@ namespace MinecraftResourcePack_Builder
             if (treeView?.SelectedItem is CompanyModel selectedFile && selectedFile.IsFolder) // 假设您的文件模型类名为YourFileModel，且有一个IsFolder属性来判断是否为文件夹
             {
                 this.Hide();
-                Template editor = new Template(selectedFile.Name);
                 string v = "";
                 switch (int.Parse(Core.Mcmeta(Core.ProjectPath(selectedFile.Name, @"src\pack.mcmeta"))))
                 {
@@ -58,13 +57,8 @@ namespace MinecraftResourcePack_Builder
                         v = "1.16.5";
                         break;
                 };
-                editor.Title = $@"{v} - 模板";
-                Editor editor2 = new Editor(selectedFile.Name, 2)
-                {
-                    Title = $@"{selectedFile.Name} - 编辑器"
-                };
-                editor.Show();
-                editor2.Show();
+
+                Open(selectedFile.Name,v);
             }
         }
 
@@ -74,16 +68,7 @@ namespace MinecraftResourcePack_Builder
             if (create.ShowDialog() == true)
             {
                 this.Hide();
-                Template editor = new Template(create.ProjectName)
-                {
-                    Title = $@"{create.ProjectVersion} - 模板"
-                };
-                Editor editor2 = new Editor(create.ProjectName, 2)
-                {
-                    Title = $@"{create.ProjectName} - 编辑器"
-                };
-                editor.Show();
-                editor2.Show();
+                Open(create.ProjectName, create.ProjectVersion);
             }
         }
 
@@ -112,6 +97,45 @@ namespace MinecraftResourcePack_Builder
         {
             Settings settings = new Settings();
             settings.ShowDialog();
+        }
+
+        private void Open(string ProjectName,string ProjectVersion,string ProjectPath = null)
+        {
+            if (Core.Isfolder(Core.TemplatePath()))
+            {
+                Directory.CreateDirectory(Core.TemplatePath());
+            }
+            if (!Core.Isfolder(Core.TemplatePath("1")) || !Core.Isfolder(Core.TemplatePath("6")) || !Core.Isfolder(Core.TemplatePath("6")))
+            {
+                TemplateDownload templateDownload = new TemplateDownload();
+                if (templateDownload.ShowDialog() == true)
+                {
+                    Template template = new Template(ProjectName)
+                    {
+                        Title = $@"{ProjectVersion} - 模板"
+                    };
+                    Editor editor = new Editor(ProjectName, ProjectPath)
+                    {
+                        Title = $@"{ProjectName} - 编辑器"
+                    };
+                    template.Show();
+                    editor.Show();
+                }
+            }
+            else
+            {
+                Template template = new Template(ProjectName)
+                {
+                    Title = $@"{ProjectVersion} - 模板"
+                };
+                Editor editor = new Editor(ProjectName, ProjectPath)
+                {
+                    Title = $@"{ProjectName} - 编辑器"
+                };
+                template.Show();
+                editor.Show();
+            }
+
         }
     }
 }

@@ -9,7 +9,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MinecraftResourcePack_Builder"
         mc:Ignorable="d"
-        Title="模板" Height="600" Width="800">
+        Title="模板" Height="600" Width="800" FontFamily="HarmonyOS Sans SC" WindowStartupLocation="CenterOwner">
     <Grid x:Name="EditorMain">
         <DockPanel x:Name="DockPanel">
             <ScrollViewer x:Name="ScrollViewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
@@ -49,10 +49,10 @@
     </DockPanel>
 
         <DockPanel x:Name="LoadingOverlay" Background="Black" Visibility="Visible" Panel.ZIndex="100" Cursor="Wait">
-            <Metro:MetroProgressBar Name="ProgressBar" Height="20" DockPanel.Dock="Top" />
             <Grid>
                 <Image Height="100" Width="100" Source="pack.png" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <Metro:AduLoading SpeedRatio="1" Width="150" Height="150" Type="Rotate" IsActived="True"  VerticalAlignment="Center" Foreground="#FF409EFF"/>
+                <TextBox x:Name="LoadingTips" Text="准备加载中..." Height="40" Background="{x:Null}" VerticalAlignment="Center"  Margin="10" FontSize="18" TextAlignment="Center" BorderBrush="{x:Null}" Foreground="White" />
             </Grid>
         </DockPanel>
         

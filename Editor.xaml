@@ -9,7 +9,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MinecraftResourcePack_Builder"
         mc:Ignorable="d"
-        Title="Editor" Height="600" Width="800">
+        Title="Editor" Height="600" Width="800" FontFamily="HarmonyOS Sans SC" WindowStartupLocation="CenterScreen">
     <Grid x:Name="EditorMain">
         <DockPanel x:Name="DockPanel">
             <ScrollViewer x:Name="ScrollViewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
@@ -31,11 +31,11 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Border Margin="5" BorderBrush="Black" BorderThickness="1">
-                                            <Button Width="180" Height="180"  BorderThickness="0" Padding="0" Click="Image_Click" Cursor="Hand">
+                                            <Button Width="180" Height="180"  BorderThickness="0" Padding="0" Click="Image_Click" MouseRightButtonDown="Button_MouseRightButtonDown" Cursor="Hand">
                                                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                    <Image Source="{Binding ImageSource}" Width="100" Height="100" />
-                                                    <TextBlock Text="{Binding ImageName}" Margin="0,150,0,0" Height="30" TextAlignment="Center" VerticalAlignment="Bottom"/>
-                                                </Grid>
+                                                        <Image Source="{Binding ImageSource}" Width="100" Height="100" />
+                                                        <TextBlock Text="{Binding ImageName}" Margin="0,150,0,0" Height="30" TextAlignment="Center" VerticalAlignment="Bottom"/>
+                                                    </Grid>
                                             </Button>
                                         </Border>
                                     </DataTemplate>
@@ -46,17 +46,16 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
-        <Canvas x:Name="ButtonPopup" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                <Metro:AduFlatButton x:Name="Refresh" Content="刷新" Width="50" Height="30" Margin="20,20,80,20" Canvas.Right="0" Canvas.Bottom="0" Click="Refresh_Click" />
+            <Canvas x:Name="ButtonPopup" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                 <Metro:AduFlatButton x:Name="Build" Content="打包" Width="50" Height="30" Margin="20" Canvas.Right="0" Canvas.Bottom="0" Click="Build_Click" />
         </Canvas>
     </DockPanel>
 
         <DockPanel x:Name="LoadingOverlay" Background="Black" Visibility="Visible" Panel.ZIndex="100" Cursor="Wait">
-            <Metro:MetroProgressBar Name="ProgressBar" Height="20" DockPanel.Dock="Top" />
             <Grid>
                 <Image Height="100" Width="100" Source="pack.png" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <Metro:AduLoading SpeedRatio="1" Width="150" Height="150" Type="Rotate" IsActived="True"  VerticalAlignment="Center" Foreground="#FF409EFF"/>
+                <TextBox x:Name="LoadingTips" Text="准备加载中..." Height="40" Background="{x:Null}" VerticalAlignment="Center"  Margin="10" FontSize="18" TextAlignment="Center" BorderBrush="{x:Null}" Foreground="White" />
             </Grid>
         </DockPanel>
         

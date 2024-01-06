@@ -57,27 +57,17 @@ namespace MinecraftResourcePack_Builder
 
         private void LoadFoldersAndImages()
         {
-            // Assume we show a progress bar
-            ProgressBar.Visibility = Visibility.Visible;
-            ProgressBar.Maximum = 100;
-            ProgressBar.Value = 0;
 
-            Progress<int> progress = new Progress<int>(value =>
-            {
-                ProgressBar.Value = value;
-            });
-
-            Task.Run(async () => await LoadData(progress)).ContinueWith(t =>
+            Task.Run(async () => await LoadData()).ContinueWith(t =>
             {
                 // Hide progress bar when done
-                ProgressBar.Visibility = Visibility.Hidden;
                 LoadingOverlay.Visibility = Visibility.Hidden;
-
                 EditorMain.Children.Remove(LoadingOverlay);
+
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        private async Task LoadData(IProgress<int> progress)
+        private async Task LoadData()
         {
             try
             {
@@ -115,7 +105,7 @@ namespace MinecraftResourcePack_Builder
                         folderItem.Images.Add(imageItem);
 
                         currentProgress++;
-                        progress?.Report((int)((double)currentProgress / total * 100));
+                        Application.Current.Dispatcher.Invoke(() => LoadingTips.Text = $"加载资源中...{currentProgress}");
                     }
 
                     Application.Current.Dispatcher.Invoke(() => Folders.Add(folderItem));

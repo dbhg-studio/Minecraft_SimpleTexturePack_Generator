@@ -9,7 +9,7 @@
         xmlns:Metro="https://github.com/aduskin"  
         xmlns:local="clr-namespace:MinecraftResourcePack_Builder"
         mc:Ignorable="d"
-        Title="创建材质包" Height="500" Width="450" WindowStartupLocation="CenterScreen" WindowStyle="ToolWindow" PlaceTitleBarOverContent="True" ResizeMode="CanMinimize">
+        Title="创建材质包" Height="500" Width="450" WindowStartupLocation="CenterScreen" WindowStyle="ToolWindow" PlaceTitleBarOverContent="True" ResizeMode="CanMinimize" FontFamily="HarmonyOS Sans SC">
     <Window.Style>
         <Style TargetType="Window" BasedOn="{StaticResource {x:Type Window}}"/>
     </Window.Style>

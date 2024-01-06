@@ -9,7 +9,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MinecraftResourcePack_Builder"
         mc:Ignorable="d"
-        Title="Minecraft简易材质包生成器" Height="600" Width="800" WindowStartupLocation="CenterScreen" PlaceTitleBarOverContent="True" ResizeMode="CanMinimize">
+        Title="Minecraft简易材质包生成器" Height="600" Width="800" WindowStartupLocation="CenterScreen" PlaceTitleBarOverContent="True" ResizeMode="CanMinimize" FontFamily="HarmonyOS Sans SC">
     <Window.Style>
         <Style TargetType="Window" BasedOn="{StaticResource {x:Type Window}}"/>
     </Window.Style>
@@ -46,8 +46,7 @@
                     </Button>
                 </Grid>
                 <Grid Height="30" Margin="0,348,0,-168">
-                    <TextBlock x:Name="SoftwareVersion" Width="150"  Text="软件版本：-.-.-.-" FontSize="16" Margin="162,0,282,0" />
-                    <TextBlock Width="50"  Text="关于"  TextAlignment="Center" FontSize="16" Margin="377,0,167,0"/>
+                    <TextBlock x:Name="SoftwareVersion"  Text="软件版本：-.-.-.-" FontSize="16" TextAlignment="Center" />
                 </Grid>
             </Grid>
         </StackPanel>

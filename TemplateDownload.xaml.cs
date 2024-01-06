@@ -183,24 +183,27 @@ namespace MinecraftResourcePack_Builder
                     File.SetAttributes(zipPath, FileAttributes.Normal);
                     File.Delete(zipPath);
                     Tips.Text = "删除缓存成功";
+                    await Task.Delay(2000);
                     Ok.Visibility = Visibility;
+                    DialogResult = true;
+                    Close();
                 }
                 else
                 {
                     Tips.Text = "没有缓存文件";
+                    await Task.Delay(2000);
+                    Ok.Visibility = Visibility;
+                    DialogResult = true;
+                    Close();
                 }
-            }
-            catch (UnauthorizedAccessException uae)
-            {
-                Tips.Text = $"没有权限：{ uae.Message}";
-            }
-            catch (IOException e)
-            {
-                Tips.Text = $"文件占用或其他IO错误：{e.Message}";
             }
             catch (Exception e)
             {
                 Tips.Text = $"删除缓存失败：{e.Message}";
+                await Task.Delay(2000);
+                Ok.Visibility = Visibility;
+                DialogResult = true;
+                Close();
             }
         }
 

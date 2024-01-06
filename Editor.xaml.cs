@@ -34,9 +34,9 @@ namespace MinecraftResourcePack_Builder
         public ObservableCollection<EFolderItem> Folders { get; set; }
         public ObservableCollection<EImageItem> Images { get; set; }
 
-        public Editor(string projectName = null, int openType = 0, string projectPath = null)
+        public Editor(string projectName = null, string projectPath = null)
         {
-            if (projectName == null && openType == 0 && projectPath == null)
+            if (projectName == null && projectPath == null)
             {
                 InitializeComponent();
                 return;
@@ -45,14 +45,8 @@ namespace MinecraftResourcePack_Builder
             {
                 ProjectName = projectName;
                 ProjectPath = projectPath;
-                OpenType = openType;
 
                 InitializeComponent();
-
-                if (openType == 1)
-                {
-                    DockPanel.Children.Remove(ButtonPopup);
-                }
                 Folders = new ObservableCollection<EFolderItem>(); // 初始化 Folders
                 FolderItemsControl.ItemsSource = Folders;
                 DataContext = this;
@@ -132,28 +126,17 @@ namespace MinecraftResourcePack_Builder
             }
 
             cancellationTokenSource = new CancellationTokenSource();
-            var token = cancellationTokenSource.Token;
-
-            // Assume we show a progress bar
-            ProgressBar.Visibility = Visibility.Visible;
-            ProgressBar.Maximum = 100;
-            ProgressBar.Value = 0;
-
-            var progress = new Progress<int>(value =>
-            {
-                ProgressBar.Value = value;
-            });
+            CancellationToken token = cancellationTokenSource.Token;
 
             Task.Run(async () =>
             {
-                // 把token传递给需要进行长时间操作的方法
-                await LoadData(progress);
+                await LoadData();
             }, token).ContinueWith(t =>
             {
                 // Hide progress bar when done
-                ProgressBar.Visibility = Visibility.Hidden;
                 LoadingOverlay.Visibility = Visibility.Hidden;
                 EditorMain.Children.Remove(LoadingOverlay);
+
                 if (t.IsCanceled)
                 {
                     // 任务被取消时的处理
@@ -166,7 +149,7 @@ namespace MinecraftResourcePack_Builder
             }, CancellationToken.None, TaskContinuationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
-        private async Task LoadData(IProgress<int> progress)
+        private async Task LoadData()
         {
             try
             {
@@ -176,7 +159,7 @@ namespace MinecraftResourcePack_Builder
                     return;
                 }
 
-                var total = folderPaths.Length;
+                int total = folderPaths.Length;
                 var currentProgress = 0;
 
                 foreach (var folderPath in folderPaths)
@@ -200,7 +183,7 @@ namespace MinecraftResourcePack_Builder
                         folderItem.Images.Add(imageItem);
 
                         currentProgress++;
-                        progress?.Report((int)((double)currentProgress / total * 100));
+                        Application.Current.Dispatcher.Invoke(() => LoadingTips.Text = $"加载中...{currentProgress}");
                     }
 
                     Application.Current.Dispatcher.Invoke(() => Folders.Add(folderItem));
@@ -268,7 +251,8 @@ namespace MinecraftResourcePack_Builder
             try
             {
                 BitmapImage bitmapImage = null;
-                await Application.Current.Dispatcher.InvokeAsync(() => {
+                await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
                     // 在UI线程上创建BitmapImage并进行初始化
                     bitmapImage = new BitmapImage();
                     bitmapImage.BeginInit();
@@ -447,7 +431,7 @@ namespace MinecraftResourcePack_Builder
             var imageItem = new EImageItem(imagePath, folderItem);
             Application.Current.Dispatcher.Invoke(async () =>
             {
-                if(folderItem !=null)
+                if (folderItem != null)
                 {
                     // 在添加之前检查图片是否已经存在于集合中
                     if (!folderItem.Images.Any(img => img.ImagePath.Equals(imagePath, StringComparison.OrdinalIgnoreCase)))
@@ -579,18 +563,129 @@ namespace MinecraftResourcePack_Builder
             });
         }
 
-        private void Refresh_Click(object sender, RoutedEventArgs e)
+        private void Button_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            // 遍历所有文件夹项，并更新它们的图像
-            foreach (var folder in Folders)
+            // 确认触发事件的源是Button，并获取绑定的DataContext
+            if (sender is Button button && button.DataContext is EImageItem imageItem)
             {
-                PopulateImages(folder);
-            }
+                // 创建上下文菜单
+                ContextMenu contextMenu = new ContextMenu();
 
-            // 通知ItemsControl刷新以更新UI
-            FolderItemsControl.Items.Refresh();
+                MenuItem menuItemEdit = new MenuItem
+                {
+                    Header = "编辑"
+                };
+                menuItemEdit.Click += (s, args) =>
+                {
+                    switch (Properties.Settings.Default.ImageEditorTool)
+                    {
+                        case 1:
+                            if (!mspaint.Open(imageItem.ImagePath))
+                            {
+                                MessageBox.Show("打开失败");
+                            }
+                            break;
+                        case 2:
+                            if (Properties.Settings.Default.PhotoshopPath == null)
+                            {
+                                if (!aseprite.Open(imageItem.ImagePath))
+                                {
+                                    if (!mspaint.Open(imageItem.ImagePath))
+                                    {
+                                        MessageBox.Show("打开失败");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (!photoshop.Open(imageItem.ImagePath))
+                                {
+                                    if (!aseprite.Open(imageItem.ImagePath))
+                                    {
+                                        if (!mspaint.Open(imageItem.ImagePath))
+                                        {
+                                            MessageBox.Show("打开失败");
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                        default:
+                            if (!aseprite.Open(imageItem.ImagePath))
+                            {
+                                if (!mspaint.Open(imageItem.ImagePath))
+                                {
+                                    MessageBox.Show("打开失败");
+                                }
+                            }
+                            break;
+                    }
+                };
+
+                MenuItem menuItemReplace = new MenuItem
+                {
+                    Header = "更换"
+                };
+                menuItemReplace.Click += (s, args) =>
+                {
+                    ReplaceTexture(imageItem);
+                };
+
+                MenuItem menuItemDelete = new MenuItem
+                {
+                    Header = "删除"
+                };
+                menuItemDelete.Click += (s, args) =>
+                {
+                    DeleteTexture(imageItem);
+                };
+
+                contextMenu.Items.Add(menuItemEdit);
+                contextMenu.Items.Add(menuItemReplace);
+                contextMenu.Items.Add(menuItemDelete);
+
+                // 显示上下文菜单
+                contextMenu.IsOpen = true;
+            }
         }
 
+        private void ReplaceTexture(EImageItem imageItem)
+        {
+            Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "PNG贴图文件 (*.png)|*.png"
+            };
+            if (openFileDialog.ShowDialog() == true)
+            {
+                string sourceImagePath = openFileDialog.FileName;
+                try
+                {
+                    // 用新图片覆盖旧图片
+                    File.Copy(sourceImagePath, imageItem.ImagePath, true);
+
+                    // 更新UI和ImageSource
+                    RefreshImageItem(imageItem.ImagePath);
+
+                    MessageBox.Show("添加成功", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"失败原因： {ex.Message}", "添加失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void DeleteTexture(EImageItem imageItem)
+        {
+            // 确保文件存在
+            if (File.Exists(imageItem.ImagePath))
+            {
+                // 删除文件
+                File.Delete(imageItem.ImagePath);
+                // 更新UI和ImageSource
+                RemoveImageItem(imageItem.ImagePath);
+            }
+        }
 
     }
 }
