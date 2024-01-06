@@ -1,4 +1,5 @@
 ﻿using AdonisUI.Controls;
+using MinecraftResourcePack_Builder.lib;
 
 namespace MinecraftResourcePack_Builder
 {
@@ -7,6 +8,7 @@ namespace MinecraftResourcePack_Builder
     /// </summary>
     public partial class Settings : AdonisWindow
     {
+        Tools tools = new Tools();
         public Settings()
         {
             InitializeComponent();
@@ -59,6 +61,16 @@ namespace MinecraftResourcePack_Builder
         {
             TemplateDownload templateDownload = new TemplateDownload();
             templateDownload.ShowDialog();
+        }
+
+        private void Gitee_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            tools.OpenLink("https://gitee.com/dbhg/MinecraftResourcePack_Builder");
+        }
+
+        private void Github_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            tools.OpenLink("https://github.com/dbhg-studio/MinecraftResourcePack_Builder");
         }
     }
 }

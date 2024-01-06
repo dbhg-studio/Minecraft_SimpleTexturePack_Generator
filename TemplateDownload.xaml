@@ -12,7 +12,7 @@
         Title="模板补全" Height="200" Width="400" WindowStartupLocation="CenterScreen" PlaceTitleBarOverContent="True" ResizeMode="CanMinimize" WindowStyle="ToolWindow" FontFamily="HarmonyOS Sans SC">
     <DockPanel x:Name="DockPanel">
         <Grid Width="400" Height="50" VerticalAlignment="Center">
-            <TextBlock x:Name="Tips" Text="加载中..." Width="280" Height="20" VerticalAlignment="Top" Margin="0,5,0,0" TextAlignment="Center" />
+            <TextBlock x:Name="Tips" Text="加载中..." Width="280" Height="20" VerticalAlignment="Top" TextAlignment="Center" />
             <Metro:MetroProgressBar Width="300" Height="20" x:Name="DProgress" SmallChange="0" Cursor="Wait" Margin="10" VerticalAlignment="Bottom" />
         </Grid>
 

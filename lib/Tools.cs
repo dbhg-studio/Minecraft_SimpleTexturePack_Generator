@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Media.Imaging;
 
@@ -372,6 +373,55 @@ namespace MinecraftResourcePack_Builder.lib
                 IsSoundEnabled = false,
             };
             return messageBox;
+        }
+
+        /// <summary>
+        /// 版本号判断
+        /// </summary>
+        /// <param name="version">版本号</param>
+        /// <returns>
+        ///  比
+        /// </returns>
+        public bool IsFirstVersionGreater(string version)
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            AssemblyInformationalVersionAttribute versionAttribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+
+            // 检查是否获取到了版本属性
+            if (versionAttribute == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                Version verA = new Version(version);
+                string informationalVersion = versionAttribute.InformationalVersion.Split('-')[0];
+                Version verB = new Version(informationalVersion);
+
+                // 比较两个版本号
+                return verA.CompareTo(verB) > 0;
+            }
+            catch (ArgumentException)
+            {
+                // 如果无法将字符串转换为有效的Version对象，返回false
+                return false;
+            }
+            catch (OverflowException)
+            {
+                // 如果版本号中的数字太大，无法转换为Version对象的一部分，也返回false
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 获取版本号
+        /// </summary>
+        public string GetVersionGreater()
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            AssemblyInformationalVersionAttribute versionAttribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            return versionAttribute.InformationalVersion;
         }
     }
 

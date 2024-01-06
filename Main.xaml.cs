@@ -6,6 +6,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using MessageBox = AdonisUI.Controls.MessageBox;
 
 namespace MinecraftResourcePack_Builder
 {
@@ -21,9 +22,11 @@ namespace MinecraftResourcePack_Builder
         public Main()
         {
             InitializeComponent();
-            SoftwareVersion.Text = $"软件版本：{Assembly.GetEntryAssembly().GetName().Version.ToString()}";
+            SoftwareVersion.Text = $"软件版本：{Core.GetVersionGreater()}";
             TreeList = GetFileSystemObjects(Core.ProjectPath());
             FileList.ItemsSource = TreeList;
+           
+
             this.Closing += delegate
             {
                 Editor editor = new Editor();

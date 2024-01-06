@@ -46,7 +46,7 @@
                     </Button>
                 </Grid>
                 <Grid Height="30" Margin="0,348,0,-168">
-                    <TextBlock x:Name="SoftwareVersion"  Text="软件版本：-.-.-.-" FontSize="16" TextAlignment="Center" />
+                    <TextBlock x:Name="SoftwareVersion"  Text="软件版本：-.-.-" FontSize="16" TextAlignment="Center" />
                 </Grid>
             </Grid>
         </StackPanel>
