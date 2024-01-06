@@ -24,7 +24,7 @@ namespace MinecraftResourcePack_Builder
         public TemplateDownload()
         {
             InitializeComponent();
-            Start();
+            _ = Start();
             Closing += delegate
             {
                 cts.Cancel();
