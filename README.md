@@ -10,24 +10,11 @@
 
 ![pack.png](./pack.png)
 
+开源仓库：[Gitee](https://gitee.com/dbhg/Minecraft_SimpleTexturePack_Generator) | [Github](https://github.com/dbhg-studio/Minecraft_SimpleTexturePack_Generator)
 
-<center>
-	<span>开源仓库：</span>
-	<a href="https://gitee.com/dbhg/MinecraftResourcePack_Builder">Gitee</a>
-	<span> | </span>
-	<a href="https://gitee.com/dbhg/MinecraftResourcePack_Builder">Gitee</a>
-</center>
+[蛋白后宫](https://dbhg.top) | [作者主页](https://alwolf.cn)
 
-<center>
-	<a href="https://dbhg.top">蛋白后宫</a>
-	<span> | </span>
-	<a href="https://alwolf.cn">作者主页</a>
-</center>
-
-<center>
-	<span> 能否点亮右上角的Star，谢谢你啦OVO!! </span>
-</center>
-
+- 能否点亮右上角的Star，谢谢你啦OVO!!
 
 ## 特点
 
