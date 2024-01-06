@@ -6,7 +6,7 @@ Minecraft SimpleTexturePack Generator
 
 ![pack.png](./pack.png)
 
-开源仓库：[Gitee](https://gitee.com/dbhg/Minecraft_SimpleTexturePack_Generator) | [Github](https://github.com/dbhg-studio/Minecraft_SimpleTexturePack_Generator)
+<center>开源仓库：[Gitee](https://gitee.com/dbhg/Minecraft_SimpleTexturePack_Generator) | [Github](https://github.com/dbhg-studio/Minecraft_SimpleTexturePack_Generator)</center>
 
 [蛋白后宫](https://dbhg.top) | [作者主页](https://alwolf.cn)
 
