@@ -376,7 +376,7 @@ namespace MinecraftResourcePack_Builder.lib
     }
 
     /// <summary>
-    /// 使用Aseprite
+    /// 调用Aseprite
     /// </summary>
     public class Aseprite
     {
@@ -440,7 +440,7 @@ namespace MinecraftResourcePack_Builder.lib
     }
 
     /// <summary>
-    /// Photoshop
+    /// 调用Photoshop
     /// </summary>
     public class Photoshop
     {
@@ -457,7 +457,11 @@ namespace MinecraftResourcePack_Builder.lib
         {
             try
             {
-                PhotoshopProcess = Process.Start($@"{AppDomain.CurrentDomain.BaseDirectory}Plugin\Aseprite\Aseprite.exe", path);
+                if(Properties.Settings.Default.PhotoshopPath == null)
+                {
+                    return false;
+                }
+                PhotoshopProcess = Process.Start($@"{Properties.Settings.Default.PhotoshopPath}", path);
                 return true;
             }
             catch (Exception)
@@ -502,4 +506,69 @@ namespace MinecraftResourcePack_Builder.lib
             }
         }
     }
+
+    /// <summary>
+    /// 调用画图
+    /// </summary>
+    public class Mspaint
+    {
+        Process MspaintProcess = null;
+
+        /// <summary>
+        /// 打开画图编辑图片
+        /// </summary>
+        /// <param name="path">图片路径</param>
+        /// <returns>
+        ///  打开成功返回 true，否则 false。
+        /// </returns>
+        public bool Open(string path)
+        {
+            try
+            {
+                MspaintProcess = Process.Start("mspaint.exe", path);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 关闭画图
+        /// </summary>
+        /// <returns>
+        ///  关闭成功返回 true，否则 false。
+        /// </returns>
+        public bool Close()
+        {
+            try
+            {
+                if (MspaintProcess != null && !MspaintProcess.HasExited)
+                {
+                    //if (!AsepriteProcess.HasExited)
+                    //{
+                    //    AsepriteProcess.Kill();
+                    //    return true;
+                    //}
+
+                    MspaintProcess.CloseMainWindow();
+                    return MspaintProcess.WaitForExit(5000);
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally
+            {
+                if (MspaintProcess != null && !MspaintProcess.HasExited)
+                {
+                    MspaintProcess.Close();
+                }
+            }
+        }
+    }
+
 }

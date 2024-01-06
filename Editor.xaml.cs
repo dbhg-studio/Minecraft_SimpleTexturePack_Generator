@@ -29,6 +29,8 @@ namespace MinecraftResourcePack_Builder
         public int OpenType { get; private set; }
         Tools tools = new Tools();
         Aseprite aseprite = new Aseprite();
+        Photoshop photoshop = new Photoshop();
+        Mspaint mspaint = new Mspaint();
         public ObservableCollection<FolderItem> Folders { get; set; }
         public ObservableCollection<ImageItem> Images { get; set; }
 
@@ -253,9 +255,38 @@ namespace MinecraftResourcePack_Builder
             var button = sender as Button;
             if (button != null && button.DataContext is ImageItem imageItem)
             {
-                if (!aseprite.Open(imageItem.ImagePath))
+                switch (Properties.Settings.Default.ImageEditorTool)
                 {
-                    MessageBox.Show("打开失败");
+                    case 1:
+                        if (!mspaint.Open(imageItem.ImagePath))
+                        {
+                            MessageBox.Show("打开失败");
+                        }
+                        break;
+                    case 2:
+                        if (!photoshop.Open(imageItem.ImagePath))
+                        {
+                            MessageBox.Show("打开失败，即将使用默认工具打开");
+                            if (!aseprite.Open(imageItem.ImagePath))
+                            {
+                                MessageBox.Show("打开失败，即将使用画图工具打开");
+                                if (!mspaint.Open(imageItem.ImagePath))
+                                {
+                                    MessageBox.Show("打开失败");
+                                }
+                            }
+                        }
+                        break;
+                    default:
+                        if (!aseprite.Open(imageItem.ImagePath))
+                        {
+                            MessageBox.Show("打开失败，即将使用画图工具打开");
+                            if (!mspaint.Open(imageItem.ImagePath))
+                            {
+                                MessageBox.Show("打开失败");
+                            }
+                        }
+                        break;
                 }
             }
         }
