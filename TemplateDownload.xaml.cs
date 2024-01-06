@@ -8,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using MessageBox = AdonisUI.Controls.MessageBox;
 
 namespace MinecraftResourcePack_Builder
 {

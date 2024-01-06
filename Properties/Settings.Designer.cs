@@ -23,7 +23,11 @@ namespace MinecraftResourcePack_Builder.Properties {
             }
         }
         
+        /// <summary>
+        /// 画图工具
+        /// </summary>
         [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsDescriptionAttribute("画图工具")]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public int ImageEditorTool {
@@ -35,7 +39,11 @@ namespace MinecraftResourcePack_Builder.Properties {
             }
         }
         
+        /// <summary>
+        /// Photoshop 软件路径
+        /// </summary>
         [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.SettingsDescriptionAttribute("Photoshop 软件路径")]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string PhotoshopPath {

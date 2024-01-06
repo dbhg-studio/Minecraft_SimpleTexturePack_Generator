@@ -111,7 +111,7 @@ namespace MinecraftResourcePack_Builder
                         }
 
                         ImageItem imageItem = new ImageItem(imagePath, folderItem);
-                      await  LoadImageAsync(imageItem); // LoadImage now directly works with the file system
+                        await LoadImageAsync(imageItem); // LoadImage now directly works with the file system
                         folderItem.Images.Add(imageItem);
 
                         currentProgress++;
@@ -175,7 +175,8 @@ namespace MinecraftResourcePack_Builder
             try
             {
                 BitmapImage bitmapImage = null;
-                await Application.Current.Dispatcher.InvokeAsync(() => {
+                await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
                     // 在UI线程上创建BitmapImage并进行初始化
                     bitmapImage = new BitmapImage();
                     bitmapImage.BeginInit();
@@ -252,5 +253,36 @@ namespace MinecraftResourcePack_Builder
         {
             tools.BuildProject(ProjectName);
         }
+    }
+}
+
+// 数据模型
+public class FolderItem
+{
+    public string FolderName { get; set; }
+    public ObservableCollection<ImageItem> Images { get; set; }
+    public string FolderPath { get; private set; } // 添加这个属性
+
+    public FolderItem(string path)
+    {
+        FolderName = Path.GetFileName(path);
+        FolderPath = path; // 保存完整路径
+        Images = new ObservableCollection<ImageItem>();
+    }
+}
+
+public class ImageItem
+{
+    public string ImagePath { get; set; }
+    public string ImageName { get; set; }
+    public FolderItem ParentFolder { get; set; } // 添加此属性以引用父文件夹
+    public string NewImagePath { get; set; }
+    public BitmapImage ImageSource { get; set; }
+
+    public ImageItem(string path, FolderItem parentFolder)
+    {
+        ImagePath = path;
+        ImageName = System.IO.Path.GetFileName(path);
+        ParentFolder = parentFolder; // 设置父文件夹引用
     }
 }

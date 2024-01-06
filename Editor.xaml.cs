@@ -29,8 +29,10 @@ namespace MinecraftResourcePack_Builder
         public int OpenType { get; private set; }
         Tools tools = new Tools();
         Aseprite aseprite = new Aseprite();
-        public ObservableCollection<FolderItem> Folders { get; set; }
-        public ObservableCollection<ImageItem> Images { get; set; }
+        Photoshop photoshop = new Photoshop();
+        Mspaint mspaint = new Mspaint();
+        public ObservableCollection<EFolderItem> Folders { get; set; }
+        public ObservableCollection<EImageItem> Images { get; set; }
 
         public Editor(string projectName = null, int openType = 0, string projectPath = null)
         {
@@ -51,7 +53,7 @@ namespace MinecraftResourcePack_Builder
                 {
                     DockPanel.Children.Remove(ButtonPopup);
                 }
-                Folders = new ObservableCollection<FolderItem>(); // 初始化 Folders
+                Folders = new ObservableCollection<EFolderItem>(); // 初始化 Folders
                 FolderItemsControl.ItemsSource = Folders;
                 DataContext = this;
                 LoadFoldersAndImages();
@@ -72,9 +74,38 @@ namespace MinecraftResourcePack_Builder
 
             this.Closing += delegate
             {
-                if (!aseprite.Close())
+                switch (Properties.Settings.Default.ImageEditorTool)
                 {
-                    MessageBox.Show("关闭失败");
+                    case 1:
+                        if (!mspaint.Close())
+                        {
+                        }
+                        break;
+                    case 2:
+                        if (Properties.Settings.Default.PhotoshopPath == null)
+                        {
+                            if (!mspaint.Close())
+                            {
+                            }
+                            if (!aseprite.Close())
+                            {
+                            }
+                        }
+                        else
+                        {
+                            if (!photoshop.Close())
+                            {
+                            }
+                        }
+                        break;
+                    default:
+                        if (!aseprite.Close())
+                        {
+                        }
+                        if (!mspaint.Close())
+                        {
+                        }
+                        break;
                 }
                 Application.Current.Shutdown();
             };
@@ -140,7 +171,7 @@ namespace MinecraftResourcePack_Builder
                     if (string.IsNullOrEmpty(folderPath))
                         continue;
 
-                    var folderItem = new FolderItem(folderPath);
+                    var folderItem = new EFolderItem(folderPath);
                     var imagePaths = ExtractImagesFromFolder(folderPath);
 
                     if (imagePaths == null)
@@ -151,7 +182,7 @@ namespace MinecraftResourcePack_Builder
                         if (string.IsNullOrEmpty(imagePath))
                             continue;
 
-                        var imageItem = new ImageItem(imagePath, folderItem);
+                        var imageItem = new EImageItem(imagePath, folderItem);
                         await LoadImageAsync(imageItem); // LoadImage now directly works with the file system
                         folderItem.Images.Add(imageItem);
 
@@ -185,7 +216,7 @@ namespace MinecraftResourcePack_Builder
             return files;
         }
 
-        private void LoadImage(ImageItem imageItem)
+        private void LoadImage(EImageItem imageItem)
         {
             string imagePath = imageItem.ImagePath;
 
@@ -219,12 +250,13 @@ namespace MinecraftResourcePack_Builder
             }
         }
 
-        private async Task LoadImageAsync(ImageItem imageItem)
+        private async Task LoadImageAsync(EImageItem imageItem)
         {
             try
             {
                 BitmapImage bitmapImage = null;
-                await Application.Current.Dispatcher.InvokeAsync(() => {
+                await Application.Current.Dispatcher.InvokeAsync(() =>
+                {
                     // 在UI线程上创建BitmapImage并进行初始化
                     bitmapImage = new BitmapImage();
                     bitmapImage.BeginInit();
@@ -251,11 +283,50 @@ namespace MinecraftResourcePack_Builder
         private void Image_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
-            if (button != null && button.DataContext is ImageItem imageItem)
+            if (button != null && button.DataContext is EImageItem imageItem)
             {
-                if (!aseprite.Open(imageItem.ImagePath))
+                switch (Properties.Settings.Default.ImageEditorTool)
                 {
-                    MessageBox.Show("打开失败");
+                    case 0:
+                        if (!aseprite.Open(imageItem.ImagePath))
+                        {
+                            MessageBox.Show("打开失败，即将使用画图工具打开");
+                            if (!mspaint.Open(imageItem.ImagePath))
+                            {
+                                MessageBox.Show("打开失败");
+                            }
+                        }
+                        break;
+                    case 1:
+                        if (!mspaint.Open(imageItem.ImagePath))
+                        {
+                            MessageBox.Show("打开失败");
+                        }
+                        break;
+                    case 2:
+                        if (!photoshop.Open(imageItem.ImagePath))
+                        {
+                            MessageBox.Show("打开失败，即将使用默认工具打开");
+                            if (!aseprite.Open(imageItem.ImagePath))
+                            {
+                                MessageBox.Show("打开失败，即将使用画图工具打开");
+                                if (!mspaint.Open(imageItem.ImagePath))
+                                {
+                                    MessageBox.Show("打开失败");
+                                }
+                            }
+                        }
+                        break;
+                    default:
+                        if (!aseprite.Open(imageItem.ImagePath))
+                        {
+                            MessageBox.Show("打开失败，即将使用画图工具打开");
+                            if (!mspaint.Open(imageItem.ImagePath))
+                            {
+                                MessageBox.Show("打开失败");
+                            }
+                        }
+                        break;
                 }
             }
         }
@@ -273,7 +344,7 @@ namespace MinecraftResourcePack_Builder
                 _watcher = new FileSystemWatcher(tools.ProjectPath(ProjectName, @"src\assets\minecraft\textures"))
                 {
                     NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName,
-                    Filter = "*.png",
+                    Filter = "*",
                     IncludeSubdirectories = true,
                     EnableRaisingEvents = true
                 };
@@ -292,21 +363,152 @@ namespace MinecraftResourcePack_Builder
 
         private void OnChanged(object source, FileSystemEventArgs e)
         {
-            // 使用BeginInvoke在UI线程上异步执行，添加一个延迟以等待文件写入完成
-            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            // 判断是文件还是文件夹
+            FileAttributes attr = File.GetAttributes(e.FullPath);
+            if (attr.HasFlag(FileAttributes.Directory))
             {
-                // 稍微延迟再尝试加载图片
-                Task.Delay(500).ContinueWith(t =>
+                switch (e.ChangeType)
                 {
-                    RefreshImageItem(e.FullPath);
-                }, TaskScheduler.FromCurrentSynchronizationContext());
-            }));
+                    case WatcherChangeTypes.Created:
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            AddNewFolderItem(e.FullPath);
+                        }));
+                        break;
+                    case WatcherChangeTypes.Deleted:
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            RemoveFolderItem(e.FullPath);
+                        }));
+                        break;
+                }
+            }
+            else
+            {
+                switch (e.ChangeType)
+                {
+                    case WatcherChangeTypes.Created:
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            // 确认图片项是否已经存在于UI集合
+                            if (!ContainsImageItemWith(e.FullPath))
+                            {
+                                AddNewImageItem(e.FullPath);
+                            }
+                        }));
+                        break;
+                    case WatcherChangeTypes.Changed:
+                        // 现有文件内容变更的逻辑保持不变
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            Task.Delay(500).ContinueWith(t =>
+                            {
+                                RefreshImageItem(e.FullPath);
+                            }, TaskScheduler.FromCurrentSynchronizationContext());
+                        }));
+                        break;
+                    case WatcherChangeTypes.Deleted:
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            RemoveImageItem(e.FullPath);
+                        }));
+                        break;
+                }
+            }
         }
 
         private void OnRenamed(object source, RenamedEventArgs e)
         {
-            // 使用InvokeAsync以避免在UI线程上造成阻塞
-            Application.Current.Dispatcher.InvokeAsync(() => UpdateUI());
+            Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                var folderPath = Path.GetDirectoryName(e.FullPath);
+                var folderItem = Folders.FirstOrDefault(f => f.FolderPath.Equals(folderPath, StringComparison.OrdinalIgnoreCase));
+                if (folderItem != null)
+                {
+                    var imageItem = folderItem.Images.FirstOrDefault(i => i.ImagePath == e.OldFullPath);
+                    if (imageItem != null)
+                    {
+                        imageItem.ImagePath = e.FullPath;
+                        imageItem.ImageName = Path.GetFileName(e.FullPath);
+                        LoadImage(imageItem); // 重新加载图片以更新ImageSource
+                    }
+                }
+            });
+        }
+
+        private bool ContainsImageItemWith(string imagePath)
+        {
+            foreach (var folder in Folders)
+            {
+                if (folder.Images.Any(img => img.ImagePath.Equals(imagePath, StringComparison.OrdinalIgnoreCase)))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private void AddNewFolderItem(string folderPath)
+        {
+            var newFolderItem = new EFolderItem(folderPath);
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Folders.Add(newFolderItem);
+               // FolderItemsControl.Items.Refresh(); // 强制刷新FolderItemsControl以显示新项
+               PopulateImages(newFolderItem); // 加载新文件夹中的图片
+            });
+        }
+
+        private void RemoveFolderItem(string folderPath)
+        {
+            var folderItemToRemove = Folders.FirstOrDefault(f => f.FolderPath.Equals(folderPath, StringComparison.OrdinalIgnoreCase));
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (folderItemToRemove != null)
+                {
+                    Folders.Remove(folderItemToRemove);
+                    // 可能还需要刷新UI以确保移除的项目不再显示
+                }
+            });
+        }
+
+        private void AddNewImageItem(string imagePath)
+        {
+            // 可能需要在这里提取父文件夹路径
+            string folderPath = Path.GetDirectoryName(imagePath);
+            // 查找对应的EFolderItem
+            var folderItem = Folders.FirstOrDefault(f => f.FolderPath.Equals(folderPath, StringComparison.OrdinalIgnoreCase));
+            var imageItem = new EImageItem(imagePath, folderItem);
+            Application.Current.Dispatcher.Invoke(async () =>
+            {
+                // 在添加之前检查图片是否已经存在于集合中
+                if (!folderItem.Images.Any(img => img.ImagePath.Equals(imagePath, StringComparison.OrdinalIgnoreCase)))
+                {
+                    folderItem.Images.Add(imageItem);
+                   await LoadImageAsync(imageItem); // 异步加载图片
+                }
+            });
+        }
+
+        private void RemoveImageItem(string imagePath)
+        {
+            // 查找包含该图片的文件夹项
+            foreach (var folderItem in Folders)
+            {
+                var imageItemToRemove = folderItem.Images.FirstOrDefault(i => i.ImagePath.Equals(imagePath, StringComparison.OrdinalIgnoreCase));
+                if (imageItemToRemove != null)
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        // 从该文件夹的图片集合中移除图片项
+                        folderItem.Images.Remove(imageItemToRemove);
+                        // 如果需要，这里也可以通知UI刷新
+                        folderItem.OnPropertyChanged(nameof(EFolderItem.Images));
+                    });
+                    break;
+                }
+            }
         }
 
         private void RefreshImageItem(string imagePath)
@@ -326,12 +528,30 @@ namespace MinecraftResourcePack_Builder
                         }
 
                         // 稍微延迟加载新图片，以确保文件系统已经完成了写操作
-                        Task.Delay(500).ContinueWith((t) =>
+                        Task.Delay(500).ContinueWith(async (t) =>
                         {
-                            LoadImage(imageItem);
+                           await LoadImageAsync(imageItem);
                         }, TaskScheduler.FromCurrentSynchronizationContext());
                     });
 
+                    break;
+                }
+                else
+                {
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        // 这里需要先尝试释放旧的BitmapImage资源，以避免文件占用的问题
+                        if (imageItem.ImageSource != null)
+                        {
+                            imageItem.ImageSource = null;
+                        }
+
+                        // 稍微延迟加载新图片，以确保文件系统已经完成了写操作
+                        Task.Delay(500).ContinueWith(async (t) =>
+                        {
+                            await LoadImageAsync(imageItem);
+                        }, TaskScheduler.FromCurrentSynchronizationContext());
+                    });
                     break;
                 }
             }
@@ -345,16 +565,16 @@ namespace MinecraftResourcePack_Builder
             {
                 // 检索更新后的文件夹和图片信息
                 var folderPaths = ExtractFolders(tools.ProjectPath(ProjectName, @"src\assets\minecraft\textures"));
-                var updatedFolders = new ObservableCollection<FolderItem>();
+                var updatedFolders = new ObservableCollection<EFolderItem>();
 
                 foreach (var folderPath in folderPaths)
                 {
-                    var folderItem = new FolderItem(folderPath);
+                    var folderItem = new EFolderItem(folderPath);
                     var imagePaths = ExtractImagesFromFolder(folderPath);
 
                     foreach (var imagePath in imagePaths)
                     {
-                        var imageItem = new ImageItem(imagePath, folderItem);
+                        var imageItem = new EImageItem(imagePath, folderItem);
                         LoadImage(imageItem);
                         folderItem.Images.Add(imageItem);
                     }
@@ -378,45 +598,45 @@ namespace MinecraftResourcePack_Builder
             }
         }
 
-        private void PopulateImages(FolderItem folderItem)
+        private async void PopulateImages(EFolderItem folderItem)
         {
             string[] imagePaths = ExtractImagesFromFolder(folderItem.FolderPath);
-            var imagesToUpdate = new ObservableCollection<ImageItem>();
-
             foreach (var imagePath in imagePaths)
             {
-                var imageItem = new ImageItem(imagePath, folderItem);
-                LoadImage(imageItem); // LoadImage 将异步执行，这里不应该有跨线程操作问题
-                imagesToUpdate.Add(imageItem);
+                var imageItem = new EImageItem(imagePath, folderItem);
+                folderItem.Images.Add(imageItem); // 这里先添加图片项
+                await imageItem.RefreshAsync(); // 然后异步地刷新图片
             }
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                folderItem.Images = imagesToUpdate;
-                folderItem.OnPropertyChanged(nameof(FolderItem.Images));
-            });
+            folderItem.OnPropertyChanged(nameof(EFolderItem.Images));
         }
 
         private void Refresh_Click(object sender, RoutedEventArgs e)
         {
-            // 遍历所有文件夹项，并更新它们的图像
-            foreach (var folder in Folders)
-            {
-                PopulateImages(folder);
-            }
-
-            // 通知ItemsControl刷新以更新UI
-            FolderItemsControl.Items.Refresh();
+            System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
+            Application.Current.Shutdown();
         }
 
+        private BitmapImage LoadBitmapFromPath(string path)
+        {
+            BitmapImage bitmap = new BitmapImage();
+            using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read))
+            {
+                bitmap.BeginInit();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad; // 这非常重要
+                bitmap.StreamSource = stream;
+                bitmap.EndInit();
+            }
+            bitmap.Freeze(); // 确保图片可以跨线程使用
+            return bitmap;
+        }
 
     }
 }
 // 数据模型
-public class FolderItem: INotifyPropertyChanged
+public class EFolderItem : INotifyPropertyChanged
 {
     public string FolderName { get; set; }
-    public ObservableCollection<ImageItem> Images { get; set; }
+    public ObservableCollection<EImageItem> Images { get; set; }
     public string FolderPath { get; private set; } // 添加这个属性
 
     public event PropertyChangedEventHandler PropertyChanged;
@@ -426,19 +646,19 @@ public class FolderItem: INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public FolderItem(string path)
+    public EFolderItem(string path)
     {
         FolderName = Path.GetFileName(path);
         FolderPath = path; // 保存完整路径
-        Images = new ObservableCollection<ImageItem>();
+        Images = new ObservableCollection<EImageItem>();
     }
 }
 
-public class ImageItem : INotifyPropertyChanged
+public class EImageItem : INotifyPropertyChanged
 {
     public string ImagePath { get; set; }
     public string ImageName { get; set; }
-    public FolderItem ParentFolder { get; set; } // 添加此属性以引用父文件夹
+    public EFolderItem ParentFolder { get; set; } // 添加此属性以引用父文件夹
     public string NewImagePath { get; set; }
     private BitmapImage _imageSource;
     public BitmapImage ImageSource
@@ -454,6 +674,49 @@ public class ImageItem : INotifyPropertyChanged
         }
     }
 
+    public async Task RefreshAsync()
+    {
+        // 先释放原先的BitmapImage资源
+        if (ImageSource != null)
+        {
+            ImageSource = null;
+            OnPropertyChanged(nameof(ImageSource));
+        }
+
+        // 重新加载图片
+        await LoadImageAsync(this).ConfigureAwait(false);
+    }
+
+    public async Task LoadImageAsync(EImageItem imageItem)
+    {
+        try
+        {
+            BitmapImage bitmapImage = null;
+            await Application.Current.Dispatcher.InvokeAsync(() =>
+            {
+                // 在UI线程上创建BitmapImage并进行初始化
+                bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.UriSource = new Uri(imageItem.ImagePath, UriKind.Absolute);
+                bitmapImage.DecodePixelWidth = 100; // 调整为合适的尺寸
+                bitmapImage.DecodePixelHeight = 100; // 调整为合适的尺寸
+                bitmapImage.EndInit();
+                bitmapImage.Freeze(); // 允许跨线程访问
+            });
+
+            // 现在bitmapImage已经不可变，可以在任何线程上访问
+            imageItem.ImageSource = bitmapImage;
+        }
+        catch (Exception ex)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                MessageBox.Show($"Failed to load image: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            });
+        }
+    }
+
     public event PropertyChangedEventHandler PropertyChanged;
 
     public void OnPropertyChanged(string propertyName)
@@ -461,7 +724,7 @@ public class ImageItem : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public ImageItem(string path, FolderItem parentFolder)
+    public EImageItem(string path, EFolderItem parentFolder)
     {
         ImagePath = path;
         ImageName = System.IO.Path.GetFileName(path);

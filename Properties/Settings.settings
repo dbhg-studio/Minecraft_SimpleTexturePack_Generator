@@ -2,10 +2,10 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="MinecraftResourcePack_Builder.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="ImageEditorTool" Type="System.Int32" Scope="User">
+    <Setting Name="ImageEditorTool" Description="画图工具" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="PhotoshopPath" Type="System.String" Scope="User">
+    <Setting Name="PhotoshopPath" Description="Photoshop 软件路径" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>
