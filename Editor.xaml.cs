@@ -604,11 +604,11 @@ namespace Minecraft_SimpleTexturePack_Generator
                     // 更新UI和ImageSource
                     RefreshImageItem(imageItem.ImagePath);
 
-                    MessageBox.Show("添加成功", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("替换成功");
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"失败原因： {ex.Message}", "添加失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"替换失败： {ex.Message}");
                 }
             }
         }
