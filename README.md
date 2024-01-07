@@ -10,7 +10,7 @@
 	<p>这是一个由蛋白后宫出品的简易材质包生成小工具，它可以帮助你快速生成我的世界简易版材质包。</p>
 </center>
 
-![pack.png](pack.png)
+![pack.png](./pack.png)
 
 
 <center>
@@ -25,6 +25,20 @@
 <center>
 	<p>能否点亮右上角的Star，谢谢你啦OVO!!</p>
 </center>
+
+## 界面展示
+
+![c14b23d98f283605.png](https://img.cdn.tencent-qq.cn/Yize/2024/01/c14b23d98f283605.png)
+
+![bc1cc906daf95096.png](https://img.cdn.tencent-qq.cn/Yize/2024/01/bc1cc906daf95096.png)
+
+![a028fbfc900a94a8.png](https://img.cdn.tencent-qq.cn/Yize/2024/01/a028fbfc900a94a8.png)
+
+![24b1d26b478f22ea.png](https://img.cdn.tencent-qq.cn/Yize/2024/01/24b1d26b478f22ea.png)
+
+![b0aa6beae4e27c92.png](https://img.cdn.tencent-qq.cn/Yize/2024/01/b0aa6beae4e27c92.png)
+
+
 
 ## 特点
 
@@ -41,6 +55,10 @@
 5. **选择材质编辑**：在编辑器区选择你想要的材质点击编辑，或者右键更多操作。
 6. **生成材质包**：点击打包按钮，工具会自动生成材质包。
 7. **应用材质包**：将生成的材质包放入我的世界的材质包文件夹中，然后在游戏设置中应用。
+
+**视频教程**
+
+![02d47799c82b5aba.png](https://img.cdn.tencent-qq.cn/Yize/2024/01/02d47799c82b5aba.png)
 
 ## 安装需求
 
