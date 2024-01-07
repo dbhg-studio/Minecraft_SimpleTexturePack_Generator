@@ -60,6 +60,12 @@
 
 ![02d47799c82b5aba.png](https://img.cdn.tencent-qq.cn/Yize/2024/01/02d47799c82b5aba.png)
 
+## 字体
+
+软件使用了HarmonyOS Sans SC字体，如果字体缺失会使用系统默认的字体。
+
+如果你不在乎美观，可不安装。
+
 ## 安装需求
 
 - Window 7 以上的系统版本
