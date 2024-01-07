@@ -46,12 +46,12 @@ namespace Minecraft_SimpleTexturePack_Generator.Properties {
         [global::System.Configuration.SettingsDescriptionAttribute("Photoshop 软件路径")]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string PhotoshopPath {
+        public string DarwTools {
             get {
-                return ((string)(this["PhotoshopPath"]));
+                return ((string)(this["DarwTools"]));
             }
             set {
-                this["PhotoshopPath"] = value;
+                this["DarwTools"] = value;
             }
         }
     }

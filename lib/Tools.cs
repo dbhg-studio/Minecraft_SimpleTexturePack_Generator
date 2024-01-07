@@ -426,138 +426,6 @@ namespace Minecraft_SimpleTexturePack_Generator.lib
     }
 
     /// <summary>
-    /// 调用Aseprite
-    /// </summary>
-    public class Aseprite
-    {
-        Process AsepriteProcess = null;
-
-        /// <summary>
-        /// 打开Aseprite编辑图片
-        /// </summary>
-        /// <param name="path">图片路径</param>
-        /// <returns>
-        ///  打开成功返回 true，否则 false。
-        /// </returns>
-        public bool Open(string path)
-        {
-            try
-            {
-                AsepriteProcess = Process.Start($@"{AppDomain.CurrentDomain.BaseDirectory}Plugin\Aseprite\Aseprite.exe", path);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// 关闭Aseprite
-        /// </summary>
-        /// <returns>
-        ///  关闭成功返回 true，否则 false。
-        /// </returns>
-        public bool Close()
-        {
-            try
-            {
-                if (AsepriteProcess != null && !AsepriteProcess.HasExited)
-                {
-                    //if (!AsepriteProcess.HasExited)
-                    //{
-                    //    AsepriteProcess.Kill();
-                    //    return true;
-                    //}
-
-                    AsepriteProcess.CloseMainWindow();
-                    return AsepriteProcess.WaitForExit(5000);
-                }
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-            finally
-            {
-                if (AsepriteProcess != null && !AsepriteProcess.HasExited)
-                {
-                    AsepriteProcess.Close();
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    /// 调用Photoshop
-    /// </summary>
-    public class Photoshop
-    {
-        Process PhotoshopProcess = null;
-
-        /// <summary>
-        /// 打开Photoshop编辑图片
-        /// </summary>
-        /// <param name="path">图片路径</param>
-        /// <returns>
-        ///  打开成功返回 true，否则 false。
-        /// </returns>
-        public bool Open(string path)
-        {
-            try
-            {
-                if (Properties.Settings.Default.PhotoshopPath == null)
-                {
-                    return false;
-                }
-                PhotoshopProcess = Process.Start($@"{Properties.Settings.Default.PhotoshopPath}", path);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// 关闭Photoshop
-        /// </summary>
-        /// <returns>
-        ///  关闭成功返回 true，否则 false。
-        /// </returns>
-        public bool Close()
-        {
-            try
-            {
-                if (PhotoshopProcess != null && !PhotoshopProcess.HasExited)
-                {
-                    //if (!AsepriteProcess.HasExited)
-                    //{
-                    //    AsepriteProcess.Kill();
-                    //    return true;
-                    //}
-
-                    PhotoshopProcess.CloseMainWindow();
-                    return PhotoshopProcess.WaitForExit(5000);
-                }
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-            finally
-            {
-                if (PhotoshopProcess != null && !PhotoshopProcess.HasExited)
-                {
-                    PhotoshopProcess.Close();
-                }
-            }
-        }
-    }
-
-    /// <summary>
     /// 调用画图
     /// </summary>
     public class Mspaint
@@ -616,6 +484,70 @@ namespace Minecraft_SimpleTexturePack_Generator.lib
                 if (MspaintProcess != null && !MspaintProcess.HasExited)
                 {
                     MspaintProcess.Close();
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 调用DarwTools
+    /// </summary>
+    public class DarwTools
+    {
+        Process DarwToolsProcess = null;
+
+        /// <summary>
+        /// 打开DarwTools编辑图片
+        /// </summary>
+        /// <param name="path">图片路径</param>
+        /// <returns>
+        ///  打开成功返回 true，否则 false。
+        /// </returns>
+        public bool Open(string path)
+        {
+            try
+            {
+                DarwToolsProcess = Process.Start($@"{Properties.Settings.Default.DarwTools}", path);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 关闭DarwTools
+        /// </summary>
+        /// <returns>
+        ///  关闭成功返回 true，否则 false。
+        /// </returns>
+        public bool Close()
+        {
+            try
+            {
+                if (DarwToolsProcess != null && !DarwToolsProcess.HasExited)
+                {
+                    //if (!AsepriteProcess.HasExited)
+                    //{
+                    //    AsepriteProcess.Kill();
+                    //    return true;
+                    //}
+
+                    DarwToolsProcess.CloseMainWindow();
+                    return DarwToolsProcess.WaitForExit(5000);
+                }
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally
+            {
+                if (DarwToolsProcess != null && !DarwToolsProcess.HasExited)
+                {
+                    DarwToolsProcess.Close();
                 }
             }
         }

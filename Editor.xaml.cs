@@ -28,8 +28,7 @@ namespace Minecraft_SimpleTexturePack_Generator
         public string ProjectPath { get; private set; }
         public int OpenType { get; private set; }
         Tools tools = new Tools();
-        Aseprite aseprite = new Aseprite();
-        Photoshop photoshop = new Photoshop();
+        DarwTools DarwTools = new DarwTools();
         Mspaint mspaint = new Mspaint();
         public ObservableCollection<EFolderItem> Folders { get; set; }
         public ObservableCollection<EImageItem> Images { get; set; }
@@ -72,32 +71,15 @@ namespace Minecraft_SimpleTexturePack_Generator
                 switch (Properties.Settings.Default.ImageEditorTool)
                 {
                     case 1:
-                        if (!mspaint.Close())
+                        if (!DarwTools.Close())
                         {
-                        }
-                        break;
-                    case 2:
-                        if (Properties.Settings.Default.PhotoshopPath == null)
-                        {
-                            if (!mspaint.Close())
-                            {
-                            }
-                            if (!aseprite.Close())
-                            {
-                            }
-                        }
-                        else
-                        {
-                            if (!photoshop.Close())
-                            {
-                            }
                         }
                         break;
                     default:
-                        if (!aseprite.Close())
+                        if (!mspaint.Close())
                         {
                         }
-                        if (!mspaint.Close())
+                        if (!DarwTools.Close())
                         {
                         }
                         break;
@@ -284,40 +266,18 @@ namespace Minecraft_SimpleTexturePack_Generator
                 switch (Properties.Settings.Default.ImageEditorTool)
                 {
                     case 1:
-                        if (!mspaint.Open(imageItem.ImagePath))
+                        if (!DarwTools.Open(imageItem.ImagePath))
                         {
-                            MessageBox.Show("打开失败");
-                        }
-                        break;
-                    case 2:
-                        if (Properties.Settings.Default.PhotoshopPath == null)
-                        {
-                            if (!aseprite.Open(imageItem.ImagePath))
+                            if (!mspaint.Open(imageItem.ImagePath))
                             {
-                                if (!mspaint.Open(imageItem.ImagePath))
-                                {
-                                    MessageBox.Show("打开失败");
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (!photoshop.Open(imageItem.ImagePath))
-                            {
-                                if (!aseprite.Open(imageItem.ImagePath))
-                                {
-                                    if (!mspaint.Open(imageItem.ImagePath))
-                                    {
-                                        MessageBox.Show("打开失败");
-                                    }
-                                }
+                                MessageBox.Show("打开失败");
                             }
                         }
                         break;
                     default:
-                        if (!aseprite.Open(imageItem.ImagePath))
+                        if (!mspaint.Open(imageItem.ImagePath))
                         {
-                            if (!mspaint.Open(imageItem.ImagePath))
+                            if (!DarwTools.Open(imageItem.ImagePath))
                             {
                                 MessageBox.Show("打开失败");
                             }
@@ -580,40 +540,18 @@ namespace Minecraft_SimpleTexturePack_Generator
                     switch (Properties.Settings.Default.ImageEditorTool)
                     {
                         case 1:
-                            if (!mspaint.Open(imageItem.ImagePath))
+                            if (!DarwTools.Open(imageItem.ImagePath))
                             {
-                                MessageBox.Show("打开失败");
-                            }
-                            break;
-                        case 2:
-                            if (Properties.Settings.Default.PhotoshopPath == null)
-                            {
-                                if (!aseprite.Open(imageItem.ImagePath))
+                                if (!mspaint.Open(imageItem.ImagePath))
                                 {
-                                    if (!mspaint.Open(imageItem.ImagePath))
-                                    {
-                                        MessageBox.Show("打开失败");
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (!photoshop.Open(imageItem.ImagePath))
-                                {
-                                    if (!aseprite.Open(imageItem.ImagePath))
-                                    {
-                                        if (!mspaint.Open(imageItem.ImagePath))
-                                        {
-                                            MessageBox.Show("打开失败");
-                                        }
-                                    }
+                                    MessageBox.Show("打开失败");
                                 }
                             }
                             break;
                         default:
-                            if (!aseprite.Open(imageItem.ImagePath))
+                            if (!mspaint.Open(imageItem.ImagePath))
                             {
-                                if (!mspaint.Open(imageItem.ImagePath))
+                                if (!DarwTools.Open(imageItem.ImagePath))
                                 {
                                     MessageBox.Show("打开失败");
                                 }

@@ -15,22 +15,15 @@ namespace Minecraft_SimpleTexturePack_Generator
             switch (Properties.Settings.Default.ImageEditorTool)
             {
                 case 1:
-                    Aseprite.IsChecked = false;
-                    Mspaint.IsChecked = true;
-                    Photoshop.IsChecked = false;
-                    break;
-                case 2:
-                    Aseprite.IsChecked = false;
+                    Tools.IsChecked = true;
                     Mspaint.IsChecked = false;
-                    Photoshop.IsChecked = true;
                     break;
                 default:
-                    Aseprite.IsChecked = true;
-                    Mspaint.IsChecked = false;
-                    Photoshop.IsChecked = false;
+                    Tools.IsChecked = false;
+                    Mspaint.IsChecked = true;
                     break;
             }
-            PhotoshopPath.Text = Properties.Settings.Default.PhotoshopPath;
+            DarwToolsPath.Text = Properties.Settings.Default.DarwTools;
         }
 
         private void Cancel_Click(object sender, System.Windows.RoutedEventArgs e)
@@ -40,21 +33,19 @@ namespace Minecraft_SimpleTexturePack_Generator
 
         private void Ok_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            if ((bool)Aseprite.IsChecked)
+            if ((bool)Mspaint.IsChecked)
             {
                 Properties.Settings.Default.ImageEditorTool = 0;
             }
-            if ((bool)Mspaint.IsChecked)
+            if ((bool)Tools.IsChecked)
             {
                 Properties.Settings.Default.ImageEditorTool = 1;
             }
-            if ((bool)Photoshop.IsChecked)
-            {
-                Properties.Settings.Default.ImageEditorTool = 2;
-            }
-            Properties.Settings.Default.PhotoshopPath = PhotoshopPath.Text;
+
+            Properties.Settings.Default.DarwTools = DarwToolsPath.Text;
             Properties.Settings.Default.Save();
             MessageBox.Show("保存成功", "设置");
+            Close();
         }
 
         private void TemplateDowload_Click(object sender, System.Windows.RoutedEventArgs e)
