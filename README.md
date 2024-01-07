@@ -10,7 +10,7 @@
 	<p>这是一个由蛋白后宫出品的简易材质包生成小工具，它可以帮助你快速生成我的世界简易版材质包。</p>
 </center>
 
-![pack.png](./pack.png)
+![pack.png](pack.png)
 
 
 <center>
