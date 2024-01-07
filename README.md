@@ -69,6 +69,7 @@
 | Microsoft.Xaml.Behaviors.Wpf | MIT      | 1.1.77     |
 | MaterialDesignThemes      | MIT      | 5.0.0-ci498 |
 | AdonisUI                  | MIT      | 1.17.1    |
+| AduSkin      | GPL-3.0      | 1.2.0 |
 | MaterialDesignColors      | MIT      | 3.0.0-ci498 |
 
 ## 致谢
